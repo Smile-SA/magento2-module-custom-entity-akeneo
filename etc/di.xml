@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Smile\CustomEntityAkeneo\Job\CustomEntity">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="steps" xsi:type="array">
+                    <item name="1" xsi:type="array">
+                        <item name="method" xsi:type="string">createTable</item>
+                        <item name="comment" xsi:type="string">Create temporary table</item>
+                    </item>
+                    <item name="2" xsi:type="array">
+                        <item name="method" xsi:type="string">insertData</item>
+                        <item name="comment" xsi:type="string">Load data from API and fill temporary table</item>
+                    </item>
+                    <item name="3" xsi:type="array">
+                        <item name="method" xsi:type="string">checkEntities</item>
+                        <item name="comment" xsi:type="string">Check already imported entities</item>
+                    </item>
+                    <item name="4" xsi:type="array">
+                        <item name="method" xsi:type="string">matchEntities</item>
+                        <item name="comment" xsi:type="string">Match code with Magento ID</item>
+                    </item>
+                    <item name="5" xsi:type="array">
+                        <item name="method" xsi:type="string">insertEntity</item>
+                        <item name="comment" xsi:type="string">Create or update entities</item>
+                    </item>
+                    <item name="6" xsi:type="array">
+                        <item name="method" xsi:type="string">initGroup</item>
+                        <item name="comment" xsi:type="string">Init entities from default skeleton</item>
+                    </item>
+                    <item name="7" xsi:type="array">
+                        <item name="method" xsi:type="string">dropTable</item>
+                        <item name="comment" xsi:type="string">Drop temporary table</item>
+                    </item>
+                    <item name="8" xsi:type="array">
+                        <item name="method" xsi:type="string">cleanCache</item>
+                        <item name="comment" xsi:type="string">Clean cache</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Smile\CustomEntityAkeneo\Job\Attribute">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="steps" xsi:type="array">
+                    <item name="1" xsi:type="array">
+                        <item name="method" xsi:type="string">loadAttributes</item>
+                        <item name="comment" xsi:type="string">Load data from APi and create temporary table</item>
+                    </item>
+                    <item name="2" xsi:type="array">
+                        <item name="method" xsi:type="string">checkEntities</item>
+                        <item name="comment" xsi:type="string">Check already imported entities</item>
+                    </item>
+                    <item name="3" xsi:type="array">
+                        <item name="method" xsi:type="string">matchEntities</item>
+                        <item name="comment" xsi:type="string">Match code with Magento ID</item>
+                    </item>
+                    <item name="4" xsi:type="array">
+                        <item name="method" xsi:type="string">matchType</item>
+                        <item name="comment" xsi:type="string">Match type</item>
+                    </item>
+                    <item name="5" xsi:type="array">
+                        <item name="method" xsi:type="string">matchAttributeSet</item>
+                        <item name="comment" xsi:type="string">Match attribute set</item>
+                    </item>
+                    <item name="6" xsi:type="array">
+                        <item name="method" xsi:type="string">addAttributes</item>
+                        <item name="comment" xsi:type="string">Add or update attributes</item>
+                    </item>
+                    <item name="7" xsi:type="array">
+                        <item name="method" xsi:type="string">dropTable</item>
+                        <item name="comment" xsi:type="string">Drop temporary table</item>
+                    </item>
+                    <item name="8" xsi:type="array">
+                        <item name="method" xsi:type="string">cleanCache</item>
+                        <item name="comment" xsi:type="string">Clean cache</item>
+                    </item>
+                </item>
+            </argument>
+            <argument name="attributeHelper" xsi:type="object">Smile\CustomEntityAkeneo\Helper\Import\Attribute</argument>
+        </arguments>
+    </type>
+    <type name="Smile\CustomEntityAkeneo\Job\Option">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="steps" xsi:type="array">
+                    <item name="1" xsi:type="array">
+                        <item name="method" xsi:type="string">loadOptions</item>
+                        <item name="comment" xsi:type="string">Load data from APi and create temporary table</item>
+                    </item>
+                    <item name="2" xsi:type="array">
+                        <item name="method" xsi:type="string">checkEntities</item>
+                        <item name="comment" xsi:type="string">Check already imported entities</item>
+                    </item>
+                    <item name="3" xsi:type="array">
+                        <item name="method" xsi:type="string">matchEntities</item>
+                        <item name="comment" xsi:type="string">Match code with Magento ID</item>
+                    </item>
+                    <item name="4" xsi:type="array">
+                        <item name="method" xsi:type="string">insertOptions</item>
+                        <item name="comment" xsi:type="string">Insert Options</item>
+                    </item>
+                    <item name="5" xsi:type="array">
+                        <item name="method" xsi:type="string">insertValues</item>
+                        <item name="comment" xsi:type="string">Insert Values</item>
+                    </item>
+                    <item name="6" xsi:type="array">
+                        <item name="method" xsi:type="string">dropTable</item>
+                        <item name="comment" xsi:type="string">Drop temporary table</item>
+                    </item>
+                    <item name="7" xsi:type="array">
+                        <item name="method" xsi:type="string">cleanCache</item>
+                        <item name="comment" xsi:type="string">Clean cache</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Smile\CustomEntityAkeneo\Job\CustomEntityRecord">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="steps" xsi:type="array">
+                    <item name="1" xsi:type="array">
+                        <item name="method" xsi:type="string">loadRecords</item>
+                        <item name="comment" xsi:type="string">Load data from APi and create temporary table</item>
+                    </item>
+                    <item name="2" xsi:type="array">
+                        <item name="method" xsi:type="string">checkEntities</item>
+                        <item name="comment" xsi:type="string">Check already imported entities</item>
+                    </item>
+                    <item name="3" xsi:type="array">
+                        <item name="method" xsi:type="string">matchEntities</item>
+                        <item name="comment" xsi:type="string">Match code with Magento ID</item>
+                    </item>
+                    <item name="4" xsi:type="array">
+                        <item name="method" xsi:type="string">updateEntityType</item>
+                        <item name="comment" xsi:type="string">Match family code with Magento ID</item>
+                    </item>
+                    <item name="5" xsi:type="array">
+                        <item name="method" xsi:type="string">createEntities</item>
+                        <item name="comment" xsi:type="string">Create or update product entities</item>
+                    </item>
+                    <item name="7" xsi:type="array">
+                        <item name="method" xsi:type="string">updateOption</item>
+                        <item name="comment" xsi:type="string">Update column values for options</item>
+                    </item>
+                    <item name="13" xsi:type="array">
+                        <item name="method" xsi:type="string">updateMultiselectValues</item>
+                        <item name="comment" xsi:type="string">Update column values for multiselect attributes</item>
+                    </item>
+                    <item name="14" xsi:type="array">
+                        <item name="method" xsi:type="string">setValues</item>
+                        <item name="comment" xsi:type="string">Set values to attributes</item>
+                    </item>
+                    <item name="12" xsi:type="array">
+                        <item name="method" xsi:type="string">setUrlKey</item>
+                        <item name="comment" xsi:type="string">Set Url</item>
+                    </item>
+                    <item name="23" xsi:type="array">
+                        <item name="method" xsi:type="string">importMedia</item>
+                        <item name="comment" xsi:type="string">Import image attributes</item>
+                    </item>
+                    <item name="24" xsi:type="array">
+                        <item name="method" xsi:type="string">dropTable</item>
+                        <item name="comment" xsi:type="string">Drop temporary table</item>
+                    </item>
+                    <item name="26" xsi:type="array">
+                        <item name="method" xsi:type="string">cleanCache</item>
+                        <item name="comment" xsi:type="string">Clean cache</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Akeneo\Connector\Helper\ReferenceEntities">
+        <plugin name="changeReferenceEntityType"
+                type="Smile\CustomEntityAkeneo\Plugin\Connector\Helper\ReferenceEntitiesPlugin"
+                sortOrder="1" disabled="false" />
+    </type>
+    <type name="Akeneo\Connector\Job\Attribute">
+        <plugin name="changeReferenceEntityAttribute"
+                type="Smile\CustomEntityAkeneo\Plugin\Connector\Job\AttributePlugin"
+                sortOrder="1" disabled="false" />
+    </type>
+    <type name="Akeneo\Connector\Job\Option">
+        <plugin name="removeReferenceEntityOption"
+                type="Smile\CustomEntityAkeneo\Plugin\Connector\Job\OptionPlugin"
+                sortOrder="1" disabled="false" />
+    </type>
+    <type name="Akeneo\Connector\Job\Product">
+        <plugin name="setCustomEntityAttributeValue"
+                type="Smile\CustomEntityAkeneo\Plugin\Connector\Job\ProductPlugin"
+                sortOrder="1" disabled="false" />
+    </type>
+</config>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="akeneo_connector">
+            <group id="smile_custom_entity" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Smile custom entity</label>
+                <field id="mode" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import Reference Entities</label>
+                    <source_model>Smile\CustomEntityAkeneo\Model\Source\Config\Mode</source_model>
+                </field>
+                <field id="reference_entities" translate="label comment" type="multiselect" sortOrder="140" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Reference Entities to import</label>
+                    <source_model>Smile\CustomEntityAkeneo\Model\Source\Config\ReferenceEntities</source_model>
+                    <comment>
+                        <![CDATA[Select the reference entities you want to retrieve from.<br/> If the multiselect is empty, it means you don't have any reference entities in your Akeneo, or the provided credentials are wrong.]]>
+                    </comment>
+                    <depends>
+                        <field id="mode">specific</field>
+                    </depends>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+            <group id="cache">
+                <field id="smile_custom_entity" translate="label" type="multiselect" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Flush cache types after Smile Custom Entity import</label>
+                    <source_model>Akeneo\Connector\Model\Source\Cache</source_model>
+                    <comment>Choose the cache type you want to flush after the Smile Custom Entity job is finished.</comment>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="smile_custom_entity_attribute" translate="label" type="multiselect" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Flush cache types after Smile Custom Entity Attribute import</label>
+                    <source_model>Akeneo\Connector\Model\Source\Cache</source_model>
+                    <comment>Choose the cache type you want to flush after the Smile Custom Entity Attribute job is finished.</comment>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="smile_custom_entity_record" translate="label" type="multiselect" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Flush cache types after Smile Custom Entity Record import</label>
+                    <source_model>Akeneo\Connector\Model\Source\Cache</source_model>
+                    <comment>Choose the cache type you want to flush after the Smile Custom Entity Record job is finished.</comment>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

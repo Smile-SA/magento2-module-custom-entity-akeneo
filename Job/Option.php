@@ -1,0 +1,359 @@
+<?php
+/**
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Smile CustomEntityAkeneo to newer
+ * versions in the future.
+ *
+ * @author    Dmytro Khrushch <dmytro.khrusch@smile-ukraine.com>
+ * @copyright 2022 Smile
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+declare(strict_types = 1);
+
+namespace Smile\CustomEntityAkeneo\Job;
+
+use Akeneo\Connector\Helper\Authenticator;
+use Akeneo\Connector\Helper\Config as AkeneoConfig;
+use Akeneo\Connector\Helper\Import\Entities;
+use Akeneo\Connector\Helper\Store as StoreHelper;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\LocalizedException;
+use Smile\CustomEntityAkeneo\Helper\Import\Option as OptionHelper;
+use Akeneo\Connector\Helper\Output as OutputHelper;
+use Akeneo\Connector\Job\Import;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\Event\ManagerInterface;
+use Smile\CustomEntityAkeneo\Helper\Import\ReferenceEntity;
+use Smile\CustomEntityAkeneo\Model\ConfigManager;
+use Zend_Db_Exception;
+use Zend_Db_Expr as Expr;
+use Zend_Db_Statement_Exception;
+
+/**
+ * Custom entity attribute options job.
+ *
+ * @category  Class
+ * @package   Smile\CustomEntityAkeneo\Job
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class Option extends Import
+{
+    /**
+     * Import code.
+     *
+     * @var string $code
+     */
+    protected string $code = 'smile_custom_entity_attribute_option';
+
+    /**
+     * Import name.
+     *
+     * @var string $name
+     */
+    protected string $name = 'Smile Custom Entity Attribute Option';
+
+    /**
+     * Cache type list.
+     *
+     * @var TypeListInterface
+     */
+    protected TypeListInterface $cacheTypeList;
+
+    /**
+     * Import config.
+     *
+     * @var ConfigManager
+     */
+    protected ConfigManager $configManager;
+
+    /**
+     * Options helper.
+     *
+     * @var OptionHelper
+     */
+    protected OptionHelper $optionHelper;
+
+    /**
+     * Store helper.
+     *
+     * @var StoreHelper
+     */
+    protected StoreHelper $storeHelper;
+
+    /**
+     * Reference entity helper.
+     *
+     * @var ReferenceEntity
+     */
+    protected ReferenceEntity $referenceEntityHelper;
+
+    /**
+     * Construct.
+     *
+     * @param OutputHelper $outputHelper
+     * @param ManagerInterface $eventManager
+     * @param Authenticator $authenticator
+     * @param Entities $entitiesHelper
+     * @param AkeneoConfig $akeneoConfig
+     * @param ConfigManager $configManager
+     * @param TypeListInterface $cacheTypeList
+     * @param OptionHelper $optionHelper
+     * @param StoreHelper $storeHelper
+     * @param ReferenceEntity $referenceEntityHelper
+     * @param array $data
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
+    public function __construct(
+        OutputHelper $outputHelper,
+        ManagerInterface $eventManager,
+        Authenticator $authenticator,
+        Entities $entitiesHelper,
+        AkeneoConfig $akeneoConfig,
+        ConfigManager      $configManager,
+        TypeListInterface  $cacheTypeList,
+        OptionHelper $optionHelper,
+        StoreHelper $storeHelper,
+        ReferenceEntity $referenceEntityHelper,
+        array $data = []
+    ) {
+        parent::__construct(
+            $outputHelper,
+            $eventManager,
+            $authenticator,
+            $entitiesHelper,
+            $akeneoConfig,
+            $data
+        );
+        $this->configManager = $configManager;
+        $this->cacheTypeList = $cacheTypeList;
+        $this->optionHelper     = $optionHelper;
+        $this->storeHelper = $storeHelper;
+        $this->referenceEntityHelper = $referenceEntityHelper;
+    }
+
+    /**
+     * Create temporary table, load options and insert it in the temporary table.
+     *
+     * @return void
+     *
+     * @throws AlreadyExistsException
+     * @throws Zend_Db_Exception
+     * @throws Zend_Db_Statement_Exception
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function loadOptions(): void
+    {
+        $adminLocaleCode = $this->storeHelper->getAdminLang();
+        $adminLabelColumn = 'labels-' . $adminLocaleCode;
+        $connection = $this->entitiesHelper->getConnection();
+        $attributeApi = $this->akeneoClient->getReferenceEntityAttributeApi();
+        $attributeOptionApi = $this->akeneoClient->getReferenceEntityAttributeOptionApi();
+        $optionsCount = 0;
+
+        $entities = $this->referenceEntityHelper->getEntitiesToImport();
+
+        if (empty($entities)) {
+            $this->jobExecutor->setMessage(__('No entities found'));
+            $this->jobExecutor->afterRun(true);
+            return;
+        }
+
+        $this->entitiesHelper->createTmpTable(
+            ['code', $adminLabelColumn],
+            $this->jobExecutor->getCurrentJob()->getCode()
+        );
+
+        foreach ($entities as $entityCode) {
+            $attributeApiResult = $attributeApi->all((string)$entityCode);
+            foreach ($attributeApiResult as $attribute) {
+                if ($attribute['type'] == 'single_option' || $attribute['type'] == 'multiple_options') {
+                    $optionsApiResult = $attributeOptionApi->all((string) $entityCode, (string) $attribute['code']);
+                    foreach ($optionsApiResult as $option) {
+                        $option['attribute'] = $entityCode . '_' . $attribute['code'];
+                        $this->entitiesHelper->insertDataFromApi($option, $this->jobExecutor->getCurrentJob()->getCode());
+                        $optionsCount++;
+                    }
+                }
+            }
+        }
+        $this->jobExecutor->setAdditionalMessage(
+            __('%1 option(s) found', $optionsCount)
+        );
+
+        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $select = $connection->select()->from(
+            $tmpTable,
+            [
+                'label'     => $adminLabelColumn,
+                'code'      => 'code',
+                'attribute' => 'attribute',
+            ]
+        )->where('`' . $adminLabelColumn . '` IS NULL');
+
+        $query = $connection->query($select);
+        while (($row = $query->fetch())) {
+            if (!isset($row['label']) || $row['label'] === null) {
+                $connection->delete($tmpTable, ['code = ?' => $row['code'], 'attribute = ?' => $row['attribute']]);
+                $this->jobExecutor->setAdditionalMessage(
+                    __(
+                        'The option %1 from attribute %2 was not imported because it did not have a translation in admin store language : %3',
+                        $row['code'],
+                        $row['attribute'],
+                        $adminLocaleCode
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * Check already imported entities are still in Magento.
+     *
+     * @return void
+     *
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function checkEntities(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $akeneoConnectorTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
+        $entityTable = $this->entitiesHelper->getTable('eav_attribute_option');
+        $selectExistingEntities = $connection->select()->from($entityTable, 'option_id');
+        $existingEntities = array_column($connection->query($selectExistingEntities)->fetchAll(), 'option_id');
+
+        $connection->delete(
+            $akeneoConnectorTable,
+            ['import = ?' => 'smile_custom_entity_attribute_option', 'entity_id NOT IN (?)' => $existingEntities]
+        );
+    }
+
+    /**
+     * Match code with entity.
+     *
+     * @return void
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws LocalizedException
+     */
+    public function matchEntities(): void
+    {
+        $this->optionHelper->matchEntity(
+            'code',
+            'eav_attribute_option',
+            'option_id',
+            $this->jobExecutor->getCurrentJob()->getCode(),
+            'attribute'
+        );
+    }
+
+    /**
+     * Create/update options.
+     *
+     * @return void
+     */
+    public function insertOptions(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $columns = [
+            'option_id'  => 'a._entity_id',
+            'sort_order' => new Expr('"0"'),
+        ];
+        if ($connection->tableColumnExists($tmpTable, 'sort_order')) {
+            $columns['sort_order'] = 'a.sort_order';
+        }
+        $options = $connection->select()->from(['a' => $tmpTable], $columns)->joinInner(
+            ['b' => $this->entitiesHelper->getTable('akeneo_connector_entities')],
+            'a.attribute = b.code AND b.import = "smile_custom_entity_attribute"',
+            [
+                'attribute_id' => 'b.entity_id',
+            ]
+        );
+        $connection->query(
+            $connection->insertFromSelect(
+                $options,
+                $this->entitiesHelper->getTable('eav_attribute_option'),
+                ['option_id', 'sort_order', 'attribute_id'],
+                1
+            )
+        );
+    }
+
+    /**
+     * Create/update option values.
+     *
+     * @return void
+     *
+     * @throws LocalizedException
+     */
+    public function insertValues(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $stores = $this->storeHelper->getStores('lang');
+        $adminLang = $this->storeHelper->getAdminLang();
+        foreach ($stores as $local => $data) {
+            if (!$connection->tableColumnExists($tmpTable, 'labels-' . $local)) {
+                continue;
+            }
+            foreach ($data as $store) {
+                $value = ($store['store_id'] == 0) ? 'labels-' . $adminLang : 'labels-' . $local;
+                $options = $connection->select()->from(
+                    ['a' => $tmpTable],
+                    [
+                        'option_id' => '_entity_id',
+                        'store_id'  => new Expr($store['store_id']),
+                        'value'     => $value,
+                    ]
+                )->joinInner(
+                    ['b' => $this->entitiesHelper->getTable('akeneo_connector_entities')],
+                    'a.attribute = b.code AND b.import = "smile_custom_entity_attribute"',
+                    []
+                )->where('`a`.`'. $value . '` IS NOT NULL ');
+                $connection->query(
+                    $connection->insertFromSelect(
+                        $options,
+                        $this->entitiesHelper->getTable('eav_attribute_option_value'),
+                        ['option_id', 'store_id', 'value'],
+                        1
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * Drop temporary table.
+     *
+     * @return void
+     */
+    public function dropTable(): void
+    {
+        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
+    }
+
+    /**
+     * Clean cache.
+     *
+     * @return void
+     */
+    public function cleanCache(): void
+    {
+        $types = $this->configManager->getCacheTypeAttribute();
+        if (empty($types)) {
+            $this->jobExecutor->setMessage(__('No cache cleaned'));
+            return;
+        }
+        $cacheTypeLabels = $this->cacheTypeList->getTypeLabels();
+        foreach ($types as $type) {
+            $this->cacheTypeList->cleanType($type);
+        }
+        $this->jobExecutor->setMessage(
+            __('Cache cleaned for: %1', join(', ', array_intersect_key($cacheTypeLabels, array_flip($types))))
+        );
+    }
+}
