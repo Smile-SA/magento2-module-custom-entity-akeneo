@@ -243,7 +243,7 @@ class CustomEntity extends Import
         $values = [
             'attribute_set_id' => '_entity_id',
             'entity_type_id' => new Expr($entityTypeId),
-            'attribute_set_name' => new Expr('CONCAT(IFNULL(`' . $label . '`, "PIM"), " (", `code`, ")")'),
+            'attribute_set_name' => new Expr('IFNULL(`' . $label . '`, `code`)'),
             'sort_order' => new Expr(1),
         ];
 

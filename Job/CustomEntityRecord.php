@@ -28,6 +28,7 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filter\FilterManager;
 use Smile\CustomEntity\Api\Data\CustomEntityInterface;
 use Smile\CustomEntityAkeneo\Helper\Import\Option as OptionHelper;
 use Smile\CustomEntityAkeneo\Helper\Import\ReferenceEntity;
@@ -103,6 +104,13 @@ class CustomEntityRecord extends Import
     protected AttributeTables $attributeTables;
 
     /**
+     * Filter manager.
+     *
+     * @var FilterManager
+     */
+    protected FilterManager $filterManager;
+
+    /**
      * Entity default attributes.
      *
      * @var string[]
@@ -140,6 +148,7 @@ class CustomEntityRecord extends Import
         StoreHelper       $storeHelper,
         ReferenceEntity   $referenceEntityHelper,
         AttributeTables   $attributeTables,
+        FilterManager     $filterManager,
         array             $data = []
     )
     {
@@ -156,6 +165,7 @@ class CustomEntityRecord extends Import
         $this->storeHelper = $storeHelper;
         $this->referenceEntityHelper = $referenceEntityHelper;
         $this->attributeTables = $attributeTables;
+        $this->filterManager = $filterManager;
     }
 
     /**
@@ -482,6 +492,13 @@ class CustomEntityRecord extends Import
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
         $tmpAttributeTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
         $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
+        $urlAttribute = $this->referenceEntityHelper->getAttribute(
+            CustomEntityInterface::URL_KEY,
+            $entityTypeId
+        );
+        $urlValuesTable = $this->entitiesHelper->getTable(
+            self::ENTITY_TABLE . '_' . $urlAttribute[AttributeInterface::BACKEND_TYPE]
+        );
 
         $select = $connection->select()
             ->from(['a' => $tmpAttributeTable], ['attribute', 'data'])
@@ -495,8 +512,19 @@ class CustomEntityRecord extends Import
                 ->where('locale = ?', $lang);
             $localeAttributes = $connection->fetchAll($select);
             if (!empty($localeAttributes)) {
-                foreach ($stores as $store) {
-                    $this->setAttributesValue($localeAttributes, $store['store_id'], $entityTypeId);
+                foreach ($localeAttributes as $row) {
+                    $url = $this->filterManager->translitUrl($row['data']);
+                    foreach ($stores as $store) {
+                        $connection->insertOnDuplicate(
+                            $urlValuesTable,
+                            [
+                                'attribute_id' => $urlAttribute[AttributeInterface::ATTRIBUTE_ID],
+                                'store_id' => $store['store_id'],
+                                'value' => $url,
+                                'entity_id' => $row['_entity_id'],
+                            ],
+                        );
+                    }
                 }
             }
         }
@@ -539,7 +567,7 @@ class CustomEntityRecord extends Import
      */
     public function dropTable()
     {
-//        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
+        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
     }
 
     /**
