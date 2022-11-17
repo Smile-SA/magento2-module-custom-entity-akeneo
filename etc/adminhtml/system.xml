@@ -20,6 +20,10 @@
                     </depends>
                     <can_be_empty>1</can_be_empty>
                 </field>
+                <field id="status" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable new entities on import</label>
+                    <source_model>Magento\Eav\Model\Entity\Attribute\Source\Boolean</source_model>
+                </field>
             </group>
             <group id="cache">
                 <field id="smile_custom_entity" translate="label" type="multiselect" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">

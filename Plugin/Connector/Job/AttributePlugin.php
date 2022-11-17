@@ -81,7 +81,9 @@ class AttributePlugin
             $connection = $this->entitiesHelper->getConnection();
             $tmpTable = $this->entitiesHelper->getTableName('attribute');
             $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
-            $select = $connection->select()->from($tmpTable)->where("frontend_input = 'smile_custom_entity'");
+            $select = $connection->select()->from($tmpTable)
+                ->where("frontend_input = 'smile_custom_entity'")
+                ->where('_is_new == 1');
             $attributes = $connection->fetchAll($select);
             $productEntityTypeId = $this->eavSetup->getEntityTypeId(ProductAttributeInterface::ENTITY_TYPE_CODE);
             foreach ($attributes as $attribute) {
@@ -95,11 +97,15 @@ class AttributePlugin
                             CustomEntityInterface::ENTITY
                         );
                     }
+                    $values = [
+                        'is_html_allowed_on_front' => 1,
+                        'custom_entity_attribute_set_id' => $customEntityTypeId
+                    ];
                     $this->eavSetup->updateAttribute(
                         $productEntityTypeId,
                         $attribute['_entity_id'],
-                        'custom_entity_attribute_set_id',
-                        $customEntityTypeId
+                        $values,
+                        null
                     );
                 }
             }

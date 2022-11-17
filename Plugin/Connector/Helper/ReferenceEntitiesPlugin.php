@@ -49,7 +49,7 @@ class ReferenceEntitiesPlugin
      *
      * @return array
      */
-    public function afterGetMappingReferenceEntities(ReferenceEntities $subject, $result): array
+    public function afterGetMappingReferenceEntities(ReferenceEntities $subject,array $result): array
     {
         if (!$this->configHelper->isReferenceEntitiesEnabled()) {
             $result = array_merge(

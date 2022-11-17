@@ -30,7 +30,6 @@ use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filter\FilterManager;
 use Smile\CustomEntity\Api\Data\CustomEntityInterface;
-use Smile\CustomEntityAkeneo\Helper\Import\Option as OptionHelper;
 use Smile\CustomEntityAkeneo\Helper\Import\ReferenceEntity;
 use Smile\CustomEntityAkeneo\Model\ConfigManager;
 use Zend_Db_Exception;
@@ -529,6 +528,46 @@ class CustomEntityRecord extends Import
             }
         }
     }
+
+    /**
+     * Set status for new records.
+     *
+     * @return void
+     */
+    public function setIsActiveValues(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
+
+        $isActiveAttribute = $this->referenceEntityHelper->getAttribute(
+            CustomEntityInterface::IS_ACTIVE,
+            $entityTypeId
+        );
+
+        $valuesTable = $this->entitiesHelper->getTable(
+            self::ENTITY_TABLE . '_' . $isActiveAttribute[AttributeInterface::BACKEND_TYPE]
+        );
+
+        $values = [
+            'attribute_id' => new Expr($isActiveAttribute[AttributeInterface::ATTRIBUTE_ID]),
+            'store_id' => new Expr('0'),
+            'value' => new Expr($this->configManager->getDefaultEntityStatus()),
+            'entity_id' => '_entity_id',
+        ];
+
+        $select = $connection->select()->from($tmpTable, $values)->where('_is_new = 1');
+
+        $connection->query(
+            $connection->insertFromSelect(
+                $select,
+                $valuesTable,
+                array_keys($values),
+                2
+            )
+        );
+    }
+
 
     /**
      * Load and save media.

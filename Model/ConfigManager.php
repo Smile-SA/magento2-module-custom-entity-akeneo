@@ -29,6 +29,7 @@ class ConfigManager
      */
     const FILTER_MODE = 'akeneo_connector/smile_custom_entity/mode';
     const FILTER_ENTITIES = 'akeneo_connector/smile_custom_entity/reference_entities';
+    const ENTITY_STATUS = 'akeneo_connector/smile_custom_entity/status';
     const CACHE_TYPE_CUSTOM_ENTITY = 'akeneo_connector/cache/smile_custom_entity';
     const CACHE_TYPE_CUSTOM_ENTITY_ATTRIBUTE = 'akeneo_connector/cache/smile_custom_entity_attribute';
     const CACHE_TYPE_CUSTOM_ENTITY_RECORD = 'akeneo_connector/cache/smile_custom_entity_record';
@@ -72,6 +73,15 @@ class ConfigManager
         return explode(',', $configuration ?? '');
     }
 
+    /**
+     * Return default status for entity record.
+     *
+     * @return int
+     */
+    public function getDefaultEntityStatus(): int
+    {
+        return (int) $this->scopeConfig->getValue(self::ENTITY_STATUS);
+    }
     /**
      * Get cache type for custom entity.
      *
