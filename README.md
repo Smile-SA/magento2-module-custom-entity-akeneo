@@ -15,6 +15,12 @@ Together we explore, invent, and test technologies of the future, to better serv
 
 Import reference entity, attributes, options and records into Smile Custom Entity module.
 
+## Documentation
+* [Installation](doc/install.md)
+* [Reference Entity](https://help.akeneo.com/pim/serenity/articles/what-about-reference-entities.html)
+* [Custom Entity](https://github.com/Smile-SA/magento2-module-custom-entity)
+* [Configuration](doc/configuration.md)
+* [Import](doc/import.md)
 
 ## Contributing
 

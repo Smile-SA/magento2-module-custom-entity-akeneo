@@ -1,14 +1,5 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Smile CustomEntityAkeneo to newer
- * versions in the future.
- *
- * @author    Dmytro Khrushch <dmytro.khrusch@smile-ukraine.com>
- * @copyright 2022 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
 declare(strict_types = 1);
 
 namespace Smile\CustomEntityAkeneo\Plugin\Connector\Job;
@@ -19,8 +10,6 @@ use Akeneo\Connector\Job\Option;
 
 /**
  * Option job plugin.
- *
- * @package Smile\CustomEntityAkeneo\Plugin\Connector\Job
  */
 class OptionPlugin
 {

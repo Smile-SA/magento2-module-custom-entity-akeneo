@@ -1,14 +1,5 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Smile CustomEntityAkeneo to newer
- * versions in the future.
- *
- * @author    Dmytro Khrushch <dmytro.khrusch@smile-ukraine.com>
- * @copyright 2022 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
 declare(strict_types = 1);
 
 namespace Smile\CustomEntityAkeneo\Setup\Patch\Data;
@@ -27,9 +18,6 @@ use Smile\CustomEntityAkeneo\Job\Option;
 
 /**
  * Create jobs for custom(reference) entities import.
- *
- * @category  Class
- * @package   Smile\CustomEntityAkeneo\Setup\Patch\Data
  */
 class CreateJobs implements DataPatchInterface
 {
@@ -109,6 +97,8 @@ class CreateJobs implements DataPatchInterface
      * @return void
      *
      * @throws AlreadyExistsException
+     *
+     * @SuppressWarnings(PHPMD)
      */
     protected function updateExistingJobs(): void
     {

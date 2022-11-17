@@ -1,14 +1,5 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Smile CustomEntityAkeneo to newer
- * versions in the future.
- *
- * @author    Dmytro Khrushch <dmytro.khrusch@smile-ukraine.com>
- * @copyright 2022 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
 declare(strict_types = 1);
 
 namespace Smile\CustomEntityAkeneo\Job;
@@ -38,9 +29,6 @@ use Zend_Db_Statement_Exception;
 
 /**
  * Custom entity record (reference record) import job.
- *
- * @category  Class
- * @package   Smile\CustomEntityAkeneo\Job
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
