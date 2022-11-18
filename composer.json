@@ -3,6 +3,19 @@
     "type": "magento2-module",
     "description": "Smile - Custom Entity Akeneo Module",
     "keywords": ["magento2", "custom", "entity", "akeneo", "connector"],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    },
     "require": {
         "php": "^7.4 || ^8.1",
         "smile/module-custom-entity": "^1.3",
