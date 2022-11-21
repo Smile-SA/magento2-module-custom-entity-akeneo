@@ -15,12 +15,12 @@ class ConfigManager
      * #@+
      * Config patch.
      */
-    const FILTER_MODE = 'akeneo_connector/smile_custom_entity/mode';
-    const FILTER_ENTITIES = 'akeneo_connector/smile_custom_entity/reference_entities';
-    const ENTITY_STATUS = 'akeneo_connector/smile_custom_entity/status';
-    const CACHE_TYPE_CUSTOM_ENTITY = 'akeneo_connector/cache/smile_custom_entity';
-    const CACHE_TYPE_CUSTOM_ENTITY_ATTRIBUTE = 'akeneo_connector/cache/smile_custom_entity_attribute';
-    const CACHE_TYPE_CUSTOM_ENTITY_RECORD = 'akeneo_connector/cache/smile_custom_entity_record';
+    public const FILTER_MODE = 'akeneo_connector/smile_custom_entity/mode';
+    public const FILTER_ENTITIES = 'akeneo_connector/smile_custom_entity/reference_entities';
+    public const ENTITY_STATUS = 'akeneo_connector/smile_custom_entity/status';
+    public const CACHE_TYPE_CUSTOM_ENTITY = 'akeneo_connector/cache/smile_custom_entity';
+    public const CACHE_TYPE_CUSTOM_ENTITY_ATTRIBUTE = 'akeneo_connector/cache/smile_custom_entity_attribute';
+    public const CACHE_TYPE_CUSTOM_ENTITY_RECORD = 'akeneo_connector/cache/smile_custom_entity_record';
     /**#@-*/
 
     /**

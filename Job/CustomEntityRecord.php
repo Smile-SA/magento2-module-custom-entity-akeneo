@@ -38,7 +38,7 @@ class CustomEntityRecord extends Import
      * #@+
      * Custom entity table.
      */
-    const ENTITY_TABLE = 'smile_custom_entity';
+    public const ENTITY_TABLE = 'smile_custom_entity';
     /**#@-*/
 
     /**
@@ -120,6 +120,7 @@ class CustomEntityRecord extends Import
      * @param StoreHelper $storeHelper
      * @param ReferenceEntity $referenceEntityHelper
      * @param AttributeTables $attributeTables
+     * @param FilterManager $filterManager
      * @param array $data
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -137,8 +138,7 @@ class CustomEntityRecord extends Import
         AttributeTables   $attributeTables,
         FilterManager     $filterManager,
         array             $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $outputHelper,
             $eventManager,
@@ -250,7 +250,8 @@ class CustomEntityRecord extends Import
 
         if (!empty($notEmptyNameRecords)) {
             $this->jobExecutor->setAdditionalMessage(
-                __('%1 record(s) was removed from the import due to an empty name for the default locale %2',
+                __(
+                    '%1 record(s) was removed from the import due to an empty name for the default locale %2',
                     implode(", ", $notEmptyNameRecords),
                     $adminLang
                 )
@@ -259,7 +260,7 @@ class CustomEntityRecord extends Import
 
         $akeneoConnectorTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
         $entityTable = $this->entitiesHelper->getTable(self::ENTITY_TABLE);
-        $deleteQuery = $connection->select()
+        $deleteSelectQuery = $connection->select()
             ->from(['ace' => $akeneoConnectorTable], null)
             ->joinLeft(
                 ['sce' => $entityTable],
@@ -268,7 +269,12 @@ class CustomEntityRecord extends Import
             )
             ->where("sce.entity_id IS NULL AND ace.import = 'smile_custom_entity_record'");
 
-        $connection->query("DELETE ace $deleteQuery");
+        $connection->query(
+            $connection->deleteFromSelect(
+                $deleteSelectQuery,
+                $akeneoConnectorTable
+            )
+        );
     }
 
     /**
@@ -445,7 +451,7 @@ class CustomEntityRecord extends Import
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
         $tmpAttributeTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
-        $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
+        $entityTypeId = (int) $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
 
         // Insert global attributes
         $select = $connection->select()
@@ -460,7 +466,7 @@ class CustomEntityRecord extends Import
             $localeAttributes = $connection->fetchAll($select->reset('where')->where('locale = ?', $lang));
             if (!empty($localeAttributes)) {
                 foreach ($stores as $store) {
-                    $this->setAttributesValue($localeAttributes, $store['store_id'], $entityTypeId);
+                    $this->setAttributesValue($localeAttributes, (int) $store['store_id'], $entityTypeId);
                 }
             }
         }
@@ -540,7 +546,7 @@ class CustomEntityRecord extends Import
         $values = [
             'attribute_id' => new Expr($isActiveAttribute[AttributeInterface::ATTRIBUTE_ID]),
             'store_id' => new Expr('0'),
-            'value' => new Expr($this->configManager->getDefaultEntityStatus()),
+            'value' => new Expr((string) $this->configManager->getDefaultEntityStatus()),
             'entity_id' => '_entity_id',
         ];
 
@@ -555,7 +561,6 @@ class CustomEntityRecord extends Import
             )
         );
     }
-
 
     /**
      * Load and save media.
@@ -636,13 +641,13 @@ class CustomEntityRecord extends Import
     /**
      * Insert attribute values.
      *
-     * @param $attributes
-     * @param $storeId
-     * @param $entityTypeId
+     * @param array $attributes
+     * @param int $storeId
+     * @param int $entityTypeId
      *
      * @return void
      */
-    protected function setAttributesValue($attributes, $storeId, $entityTypeId): void
+    protected function setAttributesValue(array $attributes, int $storeId, int $entityTypeId): void
     {
         $connection = $this->entitiesHelper->getConnection();
 

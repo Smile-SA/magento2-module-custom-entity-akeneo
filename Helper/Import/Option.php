@@ -59,21 +59,25 @@ class Option extends Entities
     /**
      * Match Magento ID with code.
      *
-     * @param $pimKey
-     * @param $entityTable
-     * @param $entityKey
-     * @param $import
-     * @param $prefix
+     * @param string $pimKey
+     * @param string $entityTable
+     * @param string $entityKey
+     * @param string $import
+     * @param string|null $prefix
      *
      * @return $this
      *
      * @throws LocalizedException
      * @throws Zend_Db_Statement_Exception
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function matchEntity($pimKey, $entityTable, $entityKey, $import, $prefix = null): self
-    {
+    public function matchEntity(
+        string $pimKey,
+        string $entityTable,
+        string $entityKey,
+        string $import,
+        string $prefix = null
+    ): self {
         $localeCode = $this->storeHelper->getAdminLang();
         $connection = $this->connection;
         $tableName = $this->getTableName($import);
@@ -134,8 +138,10 @@ class Option extends Entities
             UPDATE `' . $tableName . '` t
             SET `_entity_id` = (
                 SELECT `entity_id` FROM `' . $akeneoConnectorTable . '` c
-                WHERE ' . ($prefix ? 'CONCAT(t.`' . $prefix . '`, "-", t.`' . $pimKey . '`)' : 't.`' . $pimKey . '`') . ' = c.`code`
-                    AND c.`import` = "' . $import . '"
+                WHERE ' . ($prefix
+                    ? 'CONCAT(t.`' . $prefix . '`, "-", t.`' . $pimKey . '`)'
+                    : 't.`' . $pimKey . '`') . ' = c.`code`
+                AND c.`import` = "' . $import . '"
             )
         ';
         $connection->query(

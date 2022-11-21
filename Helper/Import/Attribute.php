@@ -8,8 +8,6 @@ use Akeneo\Connector\Helper\Import\Attribute as AkeneoAttributeHelper;
 
 /**
  * Attribute import helper.
- *
- * @category  Class
  */
 class Attribute extends AkeneoAttributeHelper
 {

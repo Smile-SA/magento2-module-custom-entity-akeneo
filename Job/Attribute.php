@@ -35,7 +35,7 @@ class Attribute extends Import
      * #@+
      * Default attribute group name.
      */
-    const DEFAULT_ATTRIBUTE_SET_NAME = 'Akeneo';
+    public const DEFAULT_ATTRIBUTE_SET_NAME = 'Akeneo';
     /**#@-*/
 
     /**
@@ -145,8 +145,7 @@ class Attribute extends Import
         EavSetup           $eavSetup,
         ReferenceEntity    $referenceEntityHelper,
         array              $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $outputHelper,
             $eventManager,
@@ -206,7 +205,8 @@ class Attribute extends Import
                 if (ctype_digit(substr($attribute['code'], 0, 1))) {
                     $this->jobExecutor->setAdditionalMessage(
                         __(
-                            'The attribute %1 was not imported because it starts with a number. Update it in Akeneo and retry.',
+                            'The attribute %1 was not imported because it starts with a number.
+                            Update it in Akeneo and retry.',
                             $attribute['code']
                         )
                     );
@@ -336,7 +336,8 @@ class Attribute extends Import
         $connection->addColumn($tmpTable, '_attribute_set_id', 'text');
         $importRelationsQuery = $connection->select()
             ->from(
-                ['tmp' => $tmpTable], 'code'
+                ['tmp' => $tmpTable],
+                'code'
             )->joinLeft(
                 ['ace' => $entityTypeTable],
                 'tmp.entity_type = ace.code',
@@ -391,7 +392,8 @@ class Attribute extends Import
 
             if ($attributeFrontendInput && ($attributeFrontendInput !== $row['frontend_input'])) {
                     $message = __(
-                        'The attribute %1 was skipped because its type is not the same between Akeneo and Magento. Please delete it in Magento and try a new import',
+                        'The attribute %1 was skipped because its type is not the same between Akeneo and Magento.
+                        Please delete it in Magento and try a new import',
                         $row['code']
                     );
                     $this->jobExecutor->setAdditionalMessage($message);
@@ -479,21 +481,17 @@ class Attribute extends Import
 
             /* Add Attribute to group and family */
             if ($row['_attribute_set_id']) {
-
                 $this->eavSetup->addAttributeGroup(
                     $this->getEntityTypeId(),
                     $row['_attribute_set_id'],
                     self::DEFAULT_ATTRIBUTE_SET_NAME
                 );
-
                 $this->eavSetup->addAttributeToSet(
                     $this->getEntityTypeId(),
                     $row['_attribute_set_id'],
                     self::DEFAULT_ATTRIBUTE_SET_NAME,
                     $row['_entity_id']
                 );
-
-
             }
 
             /* Add store labels */

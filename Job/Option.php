@@ -162,7 +162,10 @@ class Option extends Import
                     $optionsApiResult = $attributeOptionApi->all((string) $entityCode, (string) $attribute['code']);
                     foreach ($optionsApiResult as $option) {
                         $option['attribute'] = $entityCode . '_' . $attribute['code'];
-                        $this->entitiesHelper->insertDataFromApi($option, $this->jobExecutor->getCurrentJob()->getCode());
+                        $this->entitiesHelper->insertDataFromApi(
+                            $option,
+                            $this->jobExecutor->getCurrentJob()->getCode()
+                        );
                         $optionsCount++;
                     }
                 }
@@ -184,11 +187,12 @@ class Option extends Import
 
         $query = $connection->query($select);
         while (($row = $query->fetch())) {
-            if (!isset($row['label']) || $row['label'] === null) {
+            if (!isset($row['label']) || $row['label'] == null) {
                 $connection->delete($tmpTable, ['code = ?' => $row['code'], 'attribute = ?' => $row['attribute']]);
                 $this->jobExecutor->setAdditionalMessage(
                     __(
-                        'The option %1 from attribute %2 was not imported because it did not have a translation in admin store language : %3',
+                        'The option %1 from attribute %2 was not imported
+                        because it did not have a translation in admin store language : %3',
                         $row['code'],
                         $row['attribute'],
                         $adminLocaleCode

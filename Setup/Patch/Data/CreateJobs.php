@@ -106,6 +106,7 @@ class CreateJobs implements DataPatchInterface
         $index = count($this->getJobsData());
         foreach ($jobs->getItems() as $job) {
             $job->setPosition($job->getPosition() + $index);
+            /** @phpstan-ignore-next-line */
             $this->jobRepository->save($job);
         }
     }
@@ -138,7 +139,7 @@ class CreateJobs implements DataPatchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function getDependencies(): array
     {
@@ -148,7 +149,7 @@ class CreateJobs implements DataPatchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAliases(): array
     {

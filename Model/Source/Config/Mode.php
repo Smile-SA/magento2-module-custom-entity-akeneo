@@ -15,8 +15,8 @@ class Mode implements OptionSourceInterface
      * #@+
      * Mode type code.
      */
-    const ALL = 'all';
-    const SPECIFIC = 'specific';
+    public const ALL = 'all';
+    public const SPECIFIC = 'specific';
     /**#@-*/
 
     /**

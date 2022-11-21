@@ -123,7 +123,6 @@ class CustomEntity extends Import
         $this->attributeSetFactory = $attributeSetFactory;
         $this->cacheTypeList = $cacheTypeList;
         $this->configManager = $configManager;
-
     }
 
     /**
@@ -232,7 +231,7 @@ class CustomEntity extends Import
             'attribute_set_id' => '_entity_id',
             'entity_type_id' => new Expr($entityTypeId),
             'attribute_set_name' => new Expr('IFNULL(`' . $label . '`, `code`)'),
-            'sort_order' => new Expr(1),
+            'sort_order' => new Expr('1'),
         ];
 
         $entities = $connection->select()->from($tmpTable, $values);
@@ -255,6 +254,7 @@ class CustomEntity extends Import
      * @throws LocalizedException
      *
      * @throws Zend_Db_Statement_Exception
+     * @throws Exception
      */
     public function initGroup(): void
     {
@@ -263,7 +263,7 @@ class CustomEntity extends Import
         $query = $connection->query(
             $connection->select()->from($tmpTable, ['_entity_id'])->where('_is_new = ?', 1)
         );
-        $defaultAttributeSetId = $this->eavConfig->getEntityType(CustomEntityInterface::ENTITY)
+        $defaultAttributeSetId = (int) $this->eavConfig->getEntityType(CustomEntityInterface::ENTITY)
             ->getDefaultAttributeSetId();
 
         $count = 0;

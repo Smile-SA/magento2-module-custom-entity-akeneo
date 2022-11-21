@@ -34,11 +34,11 @@ class ReferenceEntitiesPlugin
      * Change reference entity frontend input type to smile_custom_entity.
      *
      * @param ReferenceEntities $subject
-     * @param $result
+     * @param array $result
      *
      * @return array
      */
-    public function afterGetMappingReferenceEntities(ReferenceEntities $subject,array $result): array
+    public function afterGetMappingReferenceEntities(ReferenceEntities $subject, array $result): array
     {
         if (!$this->configHelper->isReferenceEntitiesEnabled()) {
             $result = array_merge(
