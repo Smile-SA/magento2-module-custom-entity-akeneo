@@ -11,6 +11,7 @@ use Akeneo\Connector\Helper\Import\Entities;
 use Akeneo\Connector\Helper\Output as OutputHelper;
 use Akeneo\Connector\Helper\Store as StoreHelper;
 use Akeneo\Connector\Job\Import;
+use Exception;
 use Magento\Eav\Model\Config as EavConfig;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetup;
@@ -32,11 +33,9 @@ use Zend_Db_Statement_Exception;
 class Attribute extends Import
 {
     /**
-     * #@+
      * Default attribute group name.
      */
     public const DEFAULT_ATTRIBUTE_SET_NAME = 'Akeneo';
-    /**#@-*/
 
     /**
      * Import code.
@@ -49,43 +48,6 @@ class Attribute extends Import
     protected string $name = 'Smile Custom Entity Attribute';
 
     /**
-     * Cache type list.
-     */
-    protected TypeListInterface $cacheTypeList;
-
-    /**
-     * Import config.
-     */
-    protected ConfigManager $configManager;
-
-    /**
-     * Attribute helper.
-     */
-    protected AttributeHelper $attributeHelper;
-
-    /**
-     * Eav config.
-     */
-    protected EavConfig $eavConfig;
-
-    /**
-     * Store helper.
-     */
-    protected StoreHelper $storeHelper;
-
-    /**
-     * Eav setup.
-     */
-    protected EavSetup $eavSetup;
-
-    /**
-     * Reference entity import helper.
-     */
-    protected ReferenceEntity $referenceEntityHelper;
-
-    /**
-     * Excluded attributes from import.
-     *
      * @var string[]
      */
     protected array $excludedAttributes = [
@@ -95,25 +57,22 @@ class Attribute extends Import
     ];
 
     /**
-     * Constructor.
-     *
-     * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        OutputHelper       $outputHelper,
-        ManagerInterface   $eventManager,
-        Authenticator      $authenticator,
-        Entities           $entitiesHelper,
+        OutputHelper $outputHelper,
+        ManagerInterface $eventManager,
+        Authenticator $authenticator,
+        Entities $entitiesHelper,
         AkeneoConfigHelper $configHelper,
-        TypeListInterface  $cacheTypeList,
-        ConfigManager      $configManager,
-        EavConfig          $eavConfig,
-        AttributeHelper    $attributeHelper,
-        StoreHelper        $storeHelper,
-        EavSetup           $eavSetup,
-        ReferenceEntity    $referenceEntityHelper,
-        array              $data = []
+        protected TypeListInterface $cacheTypeList,
+        protected ConfigManager $configManager,
+        protected EavConfig $eavConfig,
+        protected AttributeHelper $attributeHelper,
+        protected StoreHelper $storeHelper,
+        protected EavSetup $eavSetup,
+        protected ReferenceEntity $referenceEntityHelper,
+        array $data = []
     ) {
         parent::__construct(
             $outputHelper,
@@ -123,13 +82,6 @@ class Attribute extends Import
             $configHelper,
             $data
         );
-        $this->cacheTypeList = $cacheTypeList;
-        $this->configManager = $configManager;
-        $this->eavConfig = $eavConfig;
-        $this->attributeHelper = $attributeHelper;
-        $this->storeHelper      = $storeHelper;
-        $this->eavSetup = $eavSetup;
-        $this->referenceEntityHelper = $referenceEntityHelper;
     }
 
     /**
@@ -188,7 +140,7 @@ class Attribute extends Import
             $this->jobExecutor->setAdditionalMessage(
                 __('%1 line(s) found', $index)
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->jobExecutor->setMessage($e->getMessage());
             $this->jobExecutor->afterRun(true);
             return;
@@ -339,7 +291,7 @@ class Attribute extends Import
         $query = $connection->query($import);
 
         while (($row = $query->fetch())) {
-            /* Verify attribute type if already present in Magento */
+            // Verify attribute type if already present in Magento
             $attributeFrontendInput = $connection->fetchOne(
                 $connection->select()->from(
                     $this->entitiesHelper->getTable('eav_attribute'),
@@ -358,7 +310,7 @@ class Attribute extends Import
             }
 
             $values = [
-                'attribute_id'   => $row['_entity_id'],
+                'attribute_id' => $row['_entity_id'],
                 'entity_type_id' => $this->getEntityTypeId(),
                 'attribute_code' => $row['code'],
             ];
@@ -379,7 +331,7 @@ class Attribute extends Import
 
             $frontendLabel = !empty($row[$adminLabelColumn]) ? $row[$adminLabelColumn] : "PIM (" . $row['code'] . ")";
 
-            /* Retrieve attribute scope */
+            // Retrieve attribute scope
             $global = ScopedAttributeInterface::SCOPE_GLOBAL; // Global
             if ($row['value_per_locale']) {
                 $global = ScopedAttributeInterface::SCOPE_STORE; // Website
@@ -392,7 +344,7 @@ class Attribute extends Import
                 'entity_type_id' => $this->getEntityTypeId(),
                 'attribute_code' => $row['code'],
                 'frontend_label' => $frontendLabel,
-                'is_global'      => $global,
+                'is_global' => $global,
             ];
             foreach ($columns as $column => $def) {
                 if (!$def['only_init']) {
@@ -403,25 +355,25 @@ class Attribute extends Import
             $defaultValues = [];
             if ($row['_is_new'] == 1) {
                 $defaultValues = [
-                    'backend_table'                 => null,
-                    'frontend_class'                => null,
-                    'is_required'                   => 0,
-                    'is_user_defined'               => 1,
-                    'default_value'                 => null,
-                    'note'                          => null,
-                    'is_visible'                    => 1,
-                    'is_system'                     => 1,
-                    'input_filter'                  => null,
-                    'multiline_count'               => 0,
-                    'validate_rules'                => null,
-                    'data_model'                    => null,
-                    'sort_order'                    => 0,
-                    'frontend_input_renderer'       => null,
-                    'is_wysiwyg_enabled'            => 0,
-                    'is_html_allowed_on_front'      => 0,
-                    'used_in_product_listing'       => 0,
-                    'apply_to'                      => null,
-                    'position'                      => 0,
+                    'backend_table' => null,
+                    'frontend_class' => null,
+                    'is_required' => 0,
+                    'is_user_defined' => 1,
+                    'default_value' => null,
+                    'note' => null,
+                    'is_visible' => 1,
+                    'is_system' => 1,
+                    'input_filter' => null,
+                    'multiline_count' => 0,
+                    'validate_rules' => null,
+                    'data_model' => null,
+                    'sort_order' => 0,
+                    'frontend_input_renderer' => null,
+                    'is_wysiwyg_enabled' => 0,
+                    'is_html_allowed_on_front' => 0,
+                    'used_in_product_listing' => 0,
+                    'apply_to' => null,
+                    'position' => 0,
                 ];
 
                 foreach (array_keys($columns) as $column) {
@@ -432,11 +384,10 @@ class Attribute extends Import
             $this->eavSetup->updateAttribute(
                 $this->getEntityTypeId(),
                 $row['_entity_id'],
-                $data,
-                null
+                $data
             );
 
-            /* Add Attribute to group and family */
+            // Add Attribute to group and family
             if ($row['_attribute_set_id']) {
                 $this->eavSetup->addAttributeGroup(
                     $this->getEntityTypeId(),
@@ -451,7 +402,7 @@ class Attribute extends Import
                 );
             }
 
-            /* Add store labels */
+            // Add store labels
             $stores = $this->storeHelper->getStores('lang');
 
             foreach ($stores as $lang => $data) {
@@ -471,7 +422,7 @@ class Attribute extends Import
                             ];
                             $where = [
                                 'attribute_id = ?' => $row['_entity_id'],
-                                'store_id = ?'     => $store['store_id'],
+                                'store_id = ?' => $store['store_id'],
                             ];
                             $connection->update(
                                 $this->entitiesHelper->getTable('eav_attribute_label'),
@@ -481,8 +432,8 @@ class Attribute extends Import
                         } else {
                             $values = [
                                 'attribute_id' => $row['_entity_id'],
-                                'store_id'     => $store['store_id'],
-                                'value'        => $row['labels-' . $lang],
+                                'store_id' => $store['store_id'],
+                                'value' => $row['labels-' . $lang],
                             ];
                             $connection->insert($this->entitiesHelper->getTable('eav_attribute_label'), $values);
                         }

@@ -21,14 +21,6 @@ use Zend_Db_Statement_Exception;
  */
 class ReferenceEntity extends Entities
 {
-    /**
-     * Config.
-     */
-    protected ConfigManager $configManager;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
         ResourceConnection $connection,
         DeploymentConfig $deploymentConfig,
@@ -36,7 +28,7 @@ class ReferenceEntity extends Entities
         ConfigHelper $configHelper,
         LoggerInterface $logger,
         Authenticator $authenticator,
-        ConfigManager $configManager
+        protected ConfigManager $configManager
     ) {
         parent::__construct(
             $connection,
@@ -46,13 +38,11 @@ class ReferenceEntity extends Entities
             $logger,
             $authenticator
         );
-        $this->configManager = $configManager;
     }
 
     /**
      * Return reference entities to import depends on configuration and imported entities.
      *
-     * @return array
      * @throws Zend_Db_Statement_Exception
      */
     public function getEntitiesToImport(): array
@@ -74,11 +64,7 @@ class ReferenceEntity extends Entities
     }
 
     /**
-     * Retrieve attribute.
-     *
-     * @param string $code
-     * @param int $entityTypeId
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @inheritdoc
      */
     public function getAttribute($code, $entityTypeId): bool|array
     {

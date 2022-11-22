@@ -15,22 +15,12 @@ use Smile\CustomEntityProductLink\Model\Entity\Attribute\Frontend\CustomEntity;
  */
 class AddCustomEntityTypeObserver implements ObserverInterface
 {
-    /**
-     * Akeneo config helper.
-     */
-    protected Config $configHelper;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(
-        Config $configHelper
-    ) {
-        $this->configHelper = $configHelper;
+    public function __construct(protected Config $configHelper)
+    {
     }
 
     /**
-     * Add smile_custom_entity type to attribute configuration.
+     * @inheritdoc
      */
     public function execute(Observer $observer): void
     {
@@ -42,10 +32,10 @@ class AddCustomEntityTypeObserver implements ObserverInterface
                 $types,
                 [
                     'smile_custom_entity' => [
-                        'backend_type'   => 'static',
+                        'backend_type' => 'static',
                         'frontend_input' => 'smile_custom_entity',
-                        'backend_model'  => null,
-                        'source_model'   => null,
+                        'backend_model' => null,
+                        'source_model' => null,
                         'frontend_model' => CustomEntity::class,
                     ],
                 ]

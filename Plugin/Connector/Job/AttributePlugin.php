@@ -17,32 +17,11 @@ use Smile\CustomEntity\Api\Data\CustomEntityInterface;
  */
 class AttributePlugin
 {
-    /**
-     * Entities helper.
-     */
-    protected Entities $entitiesHelper;
-
-    /**
-     * Eav setup.
-     */
-    protected EavSetup $eavSetup;
-
-    /**
-     * Akeneo config helper.
-     */
-    protected Config $configHelper;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
-        Entities $entitiesHelper,
-        EavSetup $eavSetup,
-        Config $configHelper
+        protected Entities $entitiesHelper,
+        protected EavSetup $eavSetup,
+        protected Config $configHelper
     ) {
-        $this->entitiesHelper = $entitiesHelper;
-        $this->eavSetup = $eavSetup;
-        $this->configHelper = $configHelper;
     }
 
     /**
@@ -79,8 +58,7 @@ class AttributePlugin
                     $this->eavSetup->updateAttribute(
                         $productEntityTypeId,
                         $attribute['_entity_id'],
-                        $values,
-                        null
+                        $values
                     );
                 }
             }

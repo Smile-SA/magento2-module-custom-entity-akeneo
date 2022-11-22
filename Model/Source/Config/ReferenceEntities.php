@@ -13,33 +13,34 @@ use Psr\Log\LoggerInterface as Logger;
  */
 class ReferenceEntities implements OptionSourceInterface
 {
-    /**
-     * Authenticator.
-     */
-    protected Authenticator $akeneoAuthenticator;
-
-    /**
-     * Logger.
-     */
-    protected Logger $logger;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
-        Authenticator $akeneoAuthenticator,
-        Logger $logger
+        protected Authenticator $akeneoAuthenticator,
+        protected Logger $logger
     ) {
-        $this->akeneoAuthenticator = $akeneoAuthenticator;
-        $this->logger = $logger;
+    }
+
+    /**
+     * Return array of options as value-label pairs.
+     */
+    public function toOptionArray(): array
+    {
+        $entities = $this->getReferenceEntities();
+        $optionArray = [];
+
+        foreach ($entities as $optionValue => $optionLabel) {
+            $optionArray[] = [
+                'value' => $optionValue,
+                'label' => $optionLabel,
+            ];
+        }
+
+        return $optionArray;
     }
 
     /**
      * Load reference entities from api.
-     *
-     * @return array
      */
-    public function getReferenceEntities(): array
+    protected function getReferenceEntities(): array
     {
         $entities = [];
 
@@ -63,25 +64,5 @@ class ReferenceEntities implements OptionSourceInterface
         }
 
         return $entities;
-    }
-
-    /**
-     * Return array of options as value-label pairs.
-     *
-     * @return array
-     */
-    public function toOptionArray(): array
-    {
-        $entities = $this->getReferenceEntities();
-        $optionArray = [];
-
-        foreach ($entities as $optionValue => $optionLabel) {
-            $optionArray[] = [
-                'value' => $optionValue,
-                'label' => $optionLabel,
-            ];
-        }
-
-        return $optionArray;
     }
 }

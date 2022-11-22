@@ -23,17 +23,8 @@ class ConfigManager
     public const CACHE_TYPE_CUSTOM_ENTITY_RECORD = 'akeneo_connector/cache/smile_custom_entity_record';
     /**#@-*/
 
-    /**
-     * Scope config.
-     */
-    protected ScopeConfigInterface $scopeConfig;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(ScopeConfigInterface $scopeConfig)
+    public function __construct(protected ScopeConfigInterface $scopeConfig)
     {
-        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -46,8 +37,6 @@ class ConfigManager
 
     /**
      * Return selected entities.
-     *
-     * @return array
      */
     public function getFilterEntities(): array
     {
@@ -64,8 +53,6 @@ class ConfigManager
     }
     /**
      * Get cache type for custom entity.
-     *
-     * @return array
      */
     public function getCacheTypeEntity(): array
     {
@@ -75,8 +62,6 @@ class ConfigManager
 
     /**
      * Get cache type for custom entity attribute.
-     *
-     * @return array
      */
     public function getCacheTypeAttribute(): array
     {
@@ -86,8 +71,6 @@ class ConfigManager
 
     /**
      * Get cache type for custom entity record.
-     *
-     * @return array
      */
     public function getCacheTypeRecord(): array
     {

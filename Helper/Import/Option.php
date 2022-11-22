@@ -11,25 +11,15 @@ use Akeneo\Connector\Helper\Store as StoreHelper;
 use Magento\Catalog\Model\Product as BaseProductModel;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
 use Smile\CustomEntity\Api\Data\CustomEntityInterface;
 use Zend_Db_Expr as Expr;
-use Zend_Db_Statement_Exception;
 
 /**
  * Options import helper.
  */
 class Option extends Entities
 {
-    /**
-     * Store helper.
-     */
-    protected StoreHelper $storeHelper;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
         ResourceConnection $connection,
         DeploymentConfig $deploymentConfig,
@@ -37,7 +27,7 @@ class Option extends Entities
         ConfigHelper $configHelper,
         LoggerInterface $logger,
         Authenticator $authenticator,
-        StoreHelper $storeHelper
+        protected StoreHelper $storeHelper
     ) {
         parent::__construct(
             $connection,
@@ -47,16 +37,10 @@ class Option extends Entities
             $logger,
             $authenticator
         );
-        $this->storeHelper = $storeHelper;
     }
 
     /**
-     * Match Magento ID with code.
-     *
-     * @return $this
-     * @throws LocalizedException
-     * @throws Zend_Db_Statement_Exception
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @inheritdoc
      */
     public function matchEntity(
         string $pimKey,
@@ -76,11 +60,10 @@ class Option extends Entities
             $entityKey = $this->getColumnIdentifier($entityTable);
         }
 
-        /* Connect existing Magento options to new Akeneo items */
-        $select = $connection->select()->from($akeneoConnectorTable, ['entity_id' => 'entity_id'])->where(
-            'import = ?',
-            $import
-        );
+        // Connect existing Magento options to new Akeneo items
+        $select = $connection->select()
+            ->from($akeneoConnectorTable, ['entity_id' => 'entity_id'])
+            ->where('import = ?', $import);
 
         $existingEntities = $connection->query($select)->fetchAll();
         $existingEntities = array_column($existingEntities, 'entity_id');
@@ -113,8 +96,8 @@ class Option extends Entities
         foreach ($entitiesToCreate as $entityToCreateKey => $entityOptionId) {
             $currentEntity = $existingMagentoOptions[$entityToCreateKey];
             $values = [
-                'import'    => $import,
-                'code'      => $currentEntity['attribute'] . '-' . $currentEntity['code'],
+                'import' => $import,
+                'code' => $currentEntity['attribute'] . '-' . $currentEntity['code'],
                 'entity_id' => $entityOptionId,
             ];
             $connection->insertOnDuplicate($akeneoConnectorTable, $values);
@@ -130,27 +113,25 @@ class Option extends Entities
                 AND c.`import` = "' . $import . '"
             )
         ';
-        $connection->query(
-            $sql
-        );
+        $connection->query($sql);
 
-        /* Set entity_id for new entities */
+        // Set entity_id for new entities
         $query = $connection->query('SHOW TABLE STATUS LIKE "' . $entityTable . '"');
         $row = $query->fetch();
 
         $connection->query('SET @id = ' . (int) $row['Auto_increment']);
         $values = [
             '_entity_id' => new Expr('@id := @id + 1'),
-            '_is_new'    => new Expr('1'),
+            '_is_new' => new Expr('1'),
         ];
         $connection->update($tableName, $values, '_entity_id IS NULL');
 
-        /* Update akeneo_connector_entities table with code and new entity_id */
+        // Update akeneo_connector_entities table with code and new entity_id
         $select = $connection->select()->from(
             $tableName,
             [
-                'import'    => new Expr("'" . $import . "'"),
-                'code'      => $prefix ? new Expr('CONCAT(`' . $prefix . '`, "-", `' . $pimKey . '`)') : $pimKey,
+                'import' => new Expr("'" . $import . "'"),
+                'code' => $prefix ? new Expr('CONCAT(`' . $prefix . '`, "-", `' . $pimKey . '`)') : $pimKey,
                 'entity_id' => '_entity_id',
             ]
         )->where('_is_new = ?', 1);
@@ -159,7 +140,7 @@ class Option extends Entities
             $connection->insertFromSelect($select, $akeneoConnectorTable, ['import', 'code', 'entity_id'], 2)
         );
 
-        /* Update entity table auto increment */
+        // Update entity table auto increment
         $count = $connection->fetchOne(
             $connection->select()->from($tableName, [new Expr('COUNT(*)')])->where('_is_new = ?', 1)
         );
@@ -175,7 +156,7 @@ class Option extends Entities
             );
 
             $connection->query(
-                    // phpcs:ignore
+                // phpcs:ignore
                 'ALTER TABLE `' . $entityTable . '` AUTO_INCREMENT = ' . (max((int) $maxCode, (int) $maxEntity) + 1)
             );
         }

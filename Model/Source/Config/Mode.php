@@ -20,9 +20,7 @@ class Mode implements OptionSourceInterface
     /**#@-*/
 
     /**
-     * Return array of options as value-label pairs.
-     *
-     * @return array
+     * @inheritdoc
      */
     public function toOptionArray(): array
     {

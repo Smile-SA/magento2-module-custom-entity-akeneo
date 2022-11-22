@@ -41,9 +41,7 @@ jobs:
                     }
                 }
             }
-      - name: 'Add Akeneo repository'
-        run: |
-          composer config repositories.magento2-connector-enterprise '{"type": "vcs", "url": "ssh://git@distribution.akeneo.com:443/magento2-connector-enterprise"}'
+
       - name: 'Get composer cache directory'
         id: 'composer-cache'
         run: 'echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT'
