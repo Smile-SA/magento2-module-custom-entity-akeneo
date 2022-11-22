@@ -21,39 +21,15 @@ use Smile\CustomEntityAkeneo\Job\Option;
  */
 class CreateJobs implements DataPatchInterface
 {
-    /**
-     * Module Data Setup.
-     */
-    protected ModuleDataSetupInterface $moduleDataSetup;
-
-    /**
-     * Akeneo connector job repository.
-     */
-    protected JobRepository $jobRepository;
-
-    /**
-     * Akeneo connector job factory.
-     */
-    protected JobFactory $jobFactory;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
-        ModuleDataSetupInterface $dataSetup,
-        JobRepository $jobRepository,
-        JobFactory $jobFactory
+        protected ModuleDataSetupInterface $moduleDataSetup,
+        protected JobRepository $jobRepository,
+        protected JobFactory $jobFactory
     ) {
-        $this->jobRepository = $jobRepository;
-        $this->jobFactory = $jobFactory;
-        $this->moduleDataSetup = $dataSetup;
     }
 
     /**
-     * Apply function.
-     *
-     * @return CreateJobs
-     * @throws AlreadyExistsException
+     * @inheritdoc
      */
     public function apply(): self
     {
@@ -84,7 +60,6 @@ class CreateJobs implements DataPatchInterface
      * Update existing job position to execute them after custom entity import.
      *
      * @throws AlreadyExistsException
-     * @SuppressWarnings(PHPMD)
      */
     protected function updateExistingJobs(): void
     {
@@ -99,8 +74,6 @@ class CreateJobs implements DataPatchInterface
 
     /**
      * Return job data.
-     *
-     * @return string[][]
      */
     protected function getJobsData(): array
     {

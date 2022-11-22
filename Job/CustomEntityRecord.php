@@ -52,38 +52,6 @@ class CustomEntityRecord extends Import
     protected string $name = 'Smile Custom Entity Record';
 
     /**
-     * Import config.
-     */
-    protected ConfigManager $configManager;
-
-    /**
-     * Cache type list.
-     */
-    protected TypeListInterface $cacheTypeList;
-
-    /**
-     * Store helper.
-     */
-    protected StoreHelper $storeHelper;
-
-    /**
-     * Reference entity helper.
-     */
-    protected ReferenceEntity $referenceEntityHelper;
-
-    /**
-     * Attribute tables.
-     */
-    protected AttributeTables $attributeTables;
-
-    /**
-     * Filter manager.
-     */
-    protected FilterManager $filterManager;
-
-    /**
-     * Entity default attributes.
-     *
      * @var string[]
      */
     protected array $defaultAttributes = [
@@ -92,24 +60,21 @@ class CustomEntityRecord extends Import
     ];
 
     /**
-     * Constructor.
-     *
-     * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        OutputHelper      $outputHelper,
-        ManagerInterface  $eventManager,
-        Authenticator     $authenticator,
-        Entities          $entitiesHelper,
-        Config            $configHelper,
-        ConfigManager     $configManager,
-        TypeListInterface $cacheTypeList,
-        StoreHelper       $storeHelper,
-        ReferenceEntity   $referenceEntityHelper,
-        AttributeTables   $attributeTables,
-        FilterManager     $filterManager,
-        array             $data = []
+        OutputHelper $outputHelper,
+        ManagerInterface $eventManager,
+        Authenticator $authenticator,
+        Entities $entitiesHelper,
+        Config $configHelper,
+        protected ConfigManager $configManager,
+        protected TypeListInterface $cacheTypeList,
+        protected StoreHelper $storeHelper,
+        protected ReferenceEntity $referenceEntityHelper,
+        protected AttributeTables $attributeTables,
+        protected FilterManager $filterManager,
+        array $data = []
     ) {
         parent::__construct(
             $outputHelper,
@@ -119,12 +84,6 @@ class CustomEntityRecord extends Import
             $configHelper,
             $data
         );
-        $this->configManager = $configManager;
-        $this->cacheTypeList = $cacheTypeList;
-        $this->storeHelper = $storeHelper;
-        $this->referenceEntityHelper = $referenceEntityHelper;
-        $this->attributeTables = $attributeTables;
-        $this->filterManager = $filterManager;
     }
 
     /**
@@ -577,8 +536,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Insert attribute values.
-     *
-     * @param array $attributes
      */
     protected function setAttributesValue(array $attributes, int $storeId, int $entityTypeId): void
     {

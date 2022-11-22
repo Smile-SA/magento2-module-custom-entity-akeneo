@@ -12,11 +12,7 @@ use Akeneo\Connector\Helper\Import\Attribute as AkeneoAttributeHelper;
 class Attribute extends AkeneoAttributeHelper
 {
     /**
-     * Match Pim type with Magento attribute logic.
-     *
-     * @param string $pimType
-     * @return array
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @inheritdoc
      */
     public function getType($pimType = 'default'): array
     {

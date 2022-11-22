@@ -14,32 +14,11 @@ use Smile\CustomEntityProductLink\Model\ResourceModel\CustomEntityProductLinkMan
  */
 class ProductPlugin
 {
-    /**
-     * Entities helper.
-     */
-    protected Entities $entitiesHelper;
-
-    /**
-     * Custom entity product link management.
-     */
-    protected CustomEntityProductLinkManagement $customEntityProductLinkManagement;
-
-    /**
-     * Akeneo config helper.
-     */
-    protected Config $configHelper;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
-        Entities $entitiesHelper,
-        CustomEntityProductLinkManagement $customEntityProductLinkManagement,
-        Config $configHelper
+        protected Entities $entitiesHelper,
+        protected CustomEntityProductLinkManagement $customEntityProductLinkManagement,
+        protected Config $configHelper
     ) {
-        $this->entitiesHelper = $entitiesHelper;
-        $this->customEntityProductLinkManagement = $customEntityProductLinkManagement;
-        $this->configHelper = $configHelper;
     }
 
     /**

@@ -12,27 +12,12 @@ use Akeneo\Connector\Helper\ReferenceEntities;
  */
 class ReferenceEntitiesPlugin
 {
-    /**
-     * Akeneo config helper.
-     */
-    protected Config $configHelper;
-
-    /**
-     * Constructor.
-     */
-    public function __construct(
-        Config $configHelper
-    ) {
-        $this->configHelper = $configHelper;
+    public function __construct(protected Config $configHelper)
+    {
     }
 
     /**
      * Change reference entity frontend input type to smile_custom_entity.
-     *
-     * @param ReferenceEntities $subject
-     * @param array $result
-     * @return array
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation
      */
     public function afterGetMappingReferenceEntities(ReferenceEntities $subject, array $result): array
     {
@@ -41,7 +26,7 @@ class ReferenceEntitiesPlugin
                 $result,
                 [
                     'akeneo_reference_entity_collection' => 'smile_custom_entity',
-                    'akeneo_reference_entity'            => 'smile_custom_entity',
+                    'akeneo_reference_entity' => 'smile_custom_entity',
                 ]
             );
         }

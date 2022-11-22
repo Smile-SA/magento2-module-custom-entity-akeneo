@@ -42,48 +42,20 @@ class CustomEntity extends Import
     protected string $name = 'Smile Custom Entity';
 
     /**
-     * Store helper.
-     */
-    protected StoreHelper $storeHelper;
-
-    /**
-     * Eav config.
-     */
-    protected EavConfig $eavConfig;
-
-    /**
-     * Attribute set factory.
-     */
-    protected SetFactory $attributeSetFactory;
-
-    /**
-     * Cache type list.
-     */
-    protected TypeListInterface $cacheTypeList;
-
-    /**
-     * Custom entity config.
-     */
-    protected ConfigManager $configManager;
-
-    /**
-     * Constructor.
-     *
-     * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        OutputHelper      $outputHelper,
-        ManagerInterface  $eventManager,
-        Authenticator     $authenticator,
-        Entities          $entitiesHelper,
-        ConfigHelper      $configHelper,
-        StoreHelper       $storeHelper,
-        EavConfig         $eavConfig,
-        SetFactory        $attributeSetFactory,
-        TypeListInterface $cacheTypeList,
-        ConfigManager     $configManager,
-        array             $data = []
+        OutputHelper $outputHelper,
+        ManagerInterface $eventManager,
+        Authenticator $authenticator,
+        Entities $entitiesHelper,
+        ConfigHelper $configHelper,
+        protected StoreHelper $storeHelper,
+        protected EavConfig $eavConfig,
+        protected SetFactory $attributeSetFactory,
+        protected TypeListInterface $cacheTypeList,
+        protected ConfigManager $configManager,
+        array $data = []
     ) {
         parent::__construct(
             $outputHelper,
@@ -93,11 +65,6 @@ class CustomEntity extends Import
             $configHelper,
             $data
         );
-        $this->storeHelper = $storeHelper;
-        $this->eavConfig = $eavConfig;
-        $this->attributeSetFactory = $attributeSetFactory;
-        $this->cacheTypeList = $cacheTypeList;
-        $this->configManager = $configManager;
     }
 
     /**
@@ -273,8 +240,6 @@ class CustomEntity extends Import
 
     /**
      * Load reference entities.
-     *
-     * @return array
      */
     protected function loadReferenceEntitiesFromApi(): array
     {

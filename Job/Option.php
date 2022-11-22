@@ -39,34 +39,6 @@ class Option extends Import
     protected string $name = 'Smile Custom Entity Attribute Option';
 
     /**
-     * Cache type list.
-     */
-    protected TypeListInterface $cacheTypeList;
-
-    /**
-     * Import config.
-     */
-    protected ConfigManager $configManager;
-
-    /**
-     * Options helper.
-     */
-    protected OptionHelper $optionHelper;
-
-    /**
-     * Store helper.
-     */
-    protected StoreHelper $storeHelper;
-
-    /**
-     * Reference entity helper.
-     */
-    protected ReferenceEntity $referenceEntityHelper;
-
-    /**
-     * Construct.
-     *
-     * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -75,11 +47,11 @@ class Option extends Import
         Authenticator $authenticator,
         Entities $entitiesHelper,
         AkeneoConfig $akeneoConfig,
-        ConfigManager      $configManager,
-        TypeListInterface  $cacheTypeList,
-        OptionHelper $optionHelper,
-        StoreHelper $storeHelper,
-        ReferenceEntity $referenceEntityHelper,
+        protected ConfigManager $configManager,
+        protected TypeListInterface $cacheTypeList,
+        protected OptionHelper $optionHelper,
+        protected StoreHelper $storeHelper,
+        protected ReferenceEntity $referenceEntityHelper,
         array $data = []
     ) {
         parent::__construct(
@@ -90,11 +62,6 @@ class Option extends Import
             $akeneoConfig,
             $data
         );
-        $this->configManager = $configManager;
-        $this->cacheTypeList = $cacheTypeList;
-        $this->optionHelper     = $optionHelper;
-        $this->storeHelper = $storeHelper;
-        $this->referenceEntityHelper = $referenceEntityHelper;
     }
 
     /**
@@ -151,8 +118,8 @@ class Option extends Import
         $select = $connection->select()->from(
             $tmpTable,
             [
-                'label'     => $adminLabelColumn,
-                'code'      => 'code',
+                'label' => $adminLabelColumn,
+                'code' => 'code',
                 'attribute' => 'attribute',
             ]
         )->where('`' . $adminLabelColumn . '` IS NULL');
@@ -218,7 +185,7 @@ class Option extends Import
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
         $columns = [
-            'option_id'  => 'a._entity_id',
+            'option_id' => 'a._entity_id',
             'sort_order' => new Expr('"0"'),
         ];
         if ($connection->tableColumnExists($tmpTable, 'sort_order')) {
@@ -262,8 +229,8 @@ class Option extends Import
                     ['a' => $tmpTable],
                     [
                         'option_id' => '_entity_id',
-                        'store_id'  => new Expr($store['store_id']),
-                        'value'     => $value,
+                        'store_id' => new Expr($store['store_id']),
+                        'value' => $value,
                     ]
                 )->joinInner(
                     ['b' => $this->entitiesHelper->getTable('akeneo_connector_entities')],
