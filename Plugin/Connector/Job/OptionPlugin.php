@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Plugin\Connector\Job;
 
@@ -15,23 +15,16 @@ class OptionPlugin
 {
     /**
      * Entities helper.
-     *
-     * @var Entities
      */
     protected Entities $entitiesHelper;
 
     /**
      * Akeneo config helper.
-     *
-     * @var Config $configHelper
      */
     protected Config $configHelper;
 
     /**
      * Constructor.
-     *
-     * @param Entities $entitiesHelper
-     * @param Config $configHelper
      */
     public function __construct(
         Entities $entitiesHelper,
@@ -43,10 +36,6 @@ class OptionPlugin
 
     /**
      * Remove reference entity attribute options.
-     *
-     * @param Option $optionJob
-     *
-     * @return void
      */
     public function afterInsertData(Option $optionJob): void
     {
@@ -63,7 +52,7 @@ class OptionPlugin
             $connection->delete(
                 $tmpOptionTable,
                 [
-                    'attribute IN (?)' => $referenceEntityAttributes
+                    'attribute IN (?)' => $referenceEntityAttributes,
                 ]
             );
         }

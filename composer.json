@@ -11,7 +11,7 @@
     ],
     "config": {
         "allow-plugins": {
-            "magento/magento-composer-installer": true,
+            "magento/magento-composer-installer": false,
             "magento/composer-dependency-version-audit-plugin": true,
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
@@ -21,7 +21,7 @@
         "php": "^8.0",
         "smile/module-custom-entity": "^1.3",
         "smile/module-custom-entity-product-link": "^1.3",
-        "akeneo/magento2-connector-enterprise": "^103.1"
+        "akeneo/magento2-connector-enterprise": "^103.2"
     },
     "require-dev": {
         "smile/magento2-smilelab-quality-suite": "^3.0"

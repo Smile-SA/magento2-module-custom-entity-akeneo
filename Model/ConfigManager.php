@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Model;
 
@@ -25,15 +25,11 @@ class ConfigManager
 
     /**
      * Scope config.
-     *
-     * @var ScopeConfigInterface
      */
     protected ScopeConfigInterface $scopeConfig;
 
     /**
      * Constructor.
-     *
-     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(ScopeConfigInterface $scopeConfig)
     {
@@ -42,8 +38,6 @@ class ConfigManager
 
     /**
      * Return entities filter mode.
-     *
-     * @return string|null
      */
     public function getFilterMode(): ?string
     {
@@ -63,8 +57,6 @@ class ConfigManager
 
     /**
      * Return default status for entity record.
-     *
-     * @return int
      */
     public function getDefaultEntityStatus(): int
     {

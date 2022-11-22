@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Helper\Import;
 
@@ -15,8 +15,8 @@ class Attribute extends AkeneoAttributeHelper
      * Match Pim type with Magento attribute logic.
      *
      * @param string $pimType
-     *
      * @return array
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function getType($pimType = 'default'): array
     {
@@ -28,7 +28,7 @@ class Attribute extends AkeneoAttributeHelper
             'single_option' => 'select',
             'multiple_options' => 'multiselect',
             'reference_entity_single_link' => 'select',
-            'reference_entity_multiple_links' => 'multiselect'
+            'reference_entity_multiple_links' => 'multiselect',
         ];
 
         return isset($types[$pimType]) ? $this->getConfiguration($types[$pimType]) : $this->getConfiguration();

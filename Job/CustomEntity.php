@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Job;
 
@@ -11,13 +11,13 @@ use Akeneo\Connector\Helper\Output as OutputHelper;
 use Akeneo\Connector\Helper\Store as StoreHelper;
 use Akeneo\Connector\Job\Import;
 use Exception;
+use Magento\Eav\Model\Config as EavConfig;
 use Magento\Eav\Model\Entity\Attribute\SetFactory;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Smile\CustomEntity\Api\Data\CustomEntityInterface;
-use Magento\Eav\Model\Config as EavConfig;
 use Smile\CustomEntityAkeneo\Model\ConfigManager;
 use Smile\CustomEntityAkeneo\Model\Source\Config\Mode;
 use Zend_Db_Exception;
@@ -33,68 +33,43 @@ class CustomEntity extends Import
 {
     /**
      * Import code.
-     *
-     * @var string $code
      */
     protected string $code = 'smile_custom_entity';
 
     /**
      * Import name.
-     *
-     * @var string $name
      */
     protected string $name = 'Smile Custom Entity';
 
     /**
      * Store helper.
-     *
-     * @var StoreHelper $storeHelper
      */
     protected StoreHelper $storeHelper;
 
     /**
      * Eav config.
-     *
-     * @var EavConfig $eavConfig
      */
     protected EavConfig $eavConfig;
 
     /**
      * Attribute set factory.
-     *
-     * @var SetFactory $attributeSetFactory
      */
     protected SetFactory $attributeSetFactory;
 
     /**
      * Cache type list.
-     *
-     * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
      * Custom entity config.
-     *
-     * @var ConfigManager
      */
     protected ConfigManager $configManager;
 
     /**
      * Constructor.
      *
-     * @param OutputHelper $outputHelper
-     * @param ManagerInterface $eventManager
-     * @param Authenticator $authenticator
-     * @param Entities $entitiesHelper
-     * @param ConfigHelper $configHelper
-     * @param StoreHelper $storeHelper
-     * @param EavConfig $eavConfig
-     * @param SetFactory $attributeSetFactory
-     * @param TypeListInterface $cacheTypeList
-     * @param ConfigManager $configManager
      * @param array $data
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -128,8 +103,6 @@ class CustomEntity extends Import
     /**
      * Create temporary table.
      *
-     * @return void
-     *
      * @throws Zend_Db_Exception
      */
     public function createTable(): void
@@ -144,8 +117,6 @@ class CustomEntity extends Import
 
     /**
      * Load data and insert it in the temporary table.
-     *
-     * @return void
      *
      * @throws AlreadyExistsException
      */
@@ -167,8 +138,6 @@ class CustomEntity extends Import
 
     /**
      * Check already imported entities are still in Magento.
-     *
-     * @return void
      *
      * @throws Zend_Db_Statement_Exception
      */
@@ -199,8 +168,6 @@ class CustomEntity extends Import
     /**
      * Match code with entity.
      *
-     * @return void
-     *
      * @throws Exception
      */
     public function matchEntities(): void
@@ -215,8 +182,6 @@ class CustomEntity extends Import
 
     /**
      * Insert entities.
-     *
-     * @return void
      *
      * @throws LocalizedException
      */
@@ -248,8 +213,6 @@ class CustomEntity extends Import
 
     /**
      * Init group.
-     *
-     * @return void
      *
      * @throws LocalizedException
      *
@@ -283,8 +246,6 @@ class CustomEntity extends Import
 
     /**
      * Drop temporary table.
-     *
-     * @return void
      */
     public function dropTable(): void
     {
@@ -293,8 +254,6 @@ class CustomEntity extends Import
 
     /**
      * Clean cache.
-     *
-     * @return void
      */
     public function cleanCache(): void
     {

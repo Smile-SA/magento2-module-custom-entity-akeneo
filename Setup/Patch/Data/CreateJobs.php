@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Setup\Patch\Data;
 
@@ -11,8 +11,8 @@ use Akeneo\Connector\Model\JobRepository;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Smile\CustomEntityAkeneo\Job\CustomEntity;
 use Smile\CustomEntityAkeneo\Job\Attribute;
+use Smile\CustomEntityAkeneo\Job\CustomEntity;
 use Smile\CustomEntityAkeneo\Job\CustomEntityRecord;
 use Smile\CustomEntityAkeneo\Job\Option;
 
@@ -23,31 +23,21 @@ class CreateJobs implements DataPatchInterface
 {
     /**
      * Module Data Setup.
-     *
-     * @var ModuleDataSetupInterface $moduleDataSetup
      */
     protected ModuleDataSetupInterface $moduleDataSetup;
 
     /**
      * Akeneo connector job repository.
-     *
-     * @var JobRepository $jobRepository
      */
     protected JobRepository $jobRepository;
 
     /**
      * Akeneo connector job factory.
-     *
-     * @var JobFactory $jobFactory
      */
     protected JobFactory $jobFactory;
 
     /**
      * Constructor.
-     *
-     * @param ModuleDataSetupInterface $dataSetup
-     * @param JobRepository $jobRepository
-     * @param JobFactory $jobFactory
      */
     public function __construct(
         ModuleDataSetupInterface $dataSetup,
@@ -63,7 +53,6 @@ class CreateJobs implements DataPatchInterface
      * Apply function.
      *
      * @return CreateJobs
-     *
      * @throws AlreadyExistsException
      */
     public function apply(): self
@@ -94,10 +83,7 @@ class CreateJobs implements DataPatchInterface
     /**
      * Update existing job position to execute them after custom entity import.
      *
-     * @return void
-     *
      * @throws AlreadyExistsException
-     *
      * @SuppressWarnings(PHPMD)
      */
     protected function updateExistingJobs(): void
@@ -121,20 +107,20 @@ class CreateJobs implements DataPatchInterface
         return [
             'smile_custom_entity' => [
                 'class' => CustomEntity::class,
-                'name' => 'Smile custom entity'
+                'name' => 'Smile custom entity',
             ],
             'smile_custom_entity_attribute' => [
                 'class' => Attribute::class,
-                'name' => 'Smile custom entity attribute'
+                'name' => 'Smile custom entity attribute',
             ],
             'smile_custom_entity_attribute_option' => [
                 'class' => Option::class,
-                'name' => 'Smile custom entity attribute option'
+                'name' => 'Smile custom entity attribute option',
             ],
             'smile_custom_entity_record' => [
                 'class' => CustomEntityRecord::class,
-                'name' => 'Smile custom entity'
-            ]
+                'name' => 'Smile custom entity',
+            ],
         ];
     }
 
@@ -144,7 +130,7 @@ class CreateJobs implements DataPatchInterface
     public static function getDependencies(): array
     {
         return [
-            \Akeneo\Connector\Setup\Patch\Data\CreateJobs::class
+            \Akeneo\Connector\Setup\Patch\Data\CreateJobs::class,
         ];
     }
 

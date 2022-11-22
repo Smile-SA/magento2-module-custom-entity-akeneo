@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Plugin\Connector\Helper;
 
@@ -14,15 +14,11 @@ class ReferenceEntitiesPlugin
 {
     /**
      * Akeneo config helper.
-     *
-     * @var Config $configHelper
      */
     protected Config $configHelper;
 
     /**
      * Constructor.
-     *
-     * @param Config $configHelper
      */
     public function __construct(
         Config $configHelper
@@ -35,8 +31,8 @@ class ReferenceEntitiesPlugin
      *
      * @param ReferenceEntities $subject
      * @param array $result
-     *
      * @return array
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation
      */
     public function afterGetMappingReferenceEntities(ReferenceEntities $subject, array $result): array
     {
@@ -45,7 +41,7 @@ class ReferenceEntitiesPlugin
                 $result,
                 [
                     'akeneo_reference_entity_collection' => 'smile_custom_entity',
-                    'akeneo_reference_entity'            => 'smile_custom_entity'
+                    'akeneo_reference_entity'            => 'smile_custom_entity',
                 ]
             );
         }

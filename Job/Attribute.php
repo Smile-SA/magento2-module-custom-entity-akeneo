@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Job;
 
@@ -40,64 +40,46 @@ class Attribute extends Import
 
     /**
      * Import code.
-     *
-     * @var string $code
      */
     protected string $code = 'smile_custom_entity_attribute';
 
     /**
      * Import name.
-     *
-     * @var string $name
      */
     protected string $name = 'Smile Custom Entity Attribute';
 
     /**
      * Cache type list.
-     *
-     * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
      * Import config.
-     *
-     * @var ConfigManager
      */
     protected ConfigManager $configManager;
 
     /**
      * Attribute helper.
-     *
-     * @var AttributeHelper $attributeHelper
      */
     protected AttributeHelper $attributeHelper;
 
     /**
      * Eav config.
-     *
-     * @var EavConfig $eavConfig
      */
     protected EavConfig $eavConfig;
 
     /**
      * Store helper.
-     *
-     * @var StoreHelper $storeHelper
      */
     protected StoreHelper $storeHelper;
 
     /**
      * Eav setup.
-     *
-     * @var EavSetup
      */
     protected EavSetup $eavSetup;
 
     /**
      * Reference entity import helper.
-     *
-     * @var ReferenceEntity
      */
     protected ReferenceEntity $referenceEntityHelper;
 
@@ -106,29 +88,16 @@ class Attribute extends Import
      *
      * @var string[]
      */
-    protected $excludedAttributes = [
+    protected array $excludedAttributes = [
         'code',
         'label',
-        'image'
+        'image',
     ];
 
     /**
      * Constructor.
      *
-     * @param OutputHelper $outputHelper
-     * @param ManagerInterface $eventManager
-     * @param Authenticator $authenticator
-     * @param Entities $entitiesHelper
-     * @param AkeneoConfigHelper $configHelper
-     * @param TypeListInterface $cacheTypeList
-     * @param ConfigManager $configManager
-     * @param EavConfig $eavConfig
-     * @param AttributeHelper $attributeHelper
-     * @param StoreHelper $storeHelper
-     * @param EavSetup $eavSetup
-     * @param ReferenceEntity $referenceEntityHelper
      * @param array $data
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -166,8 +135,6 @@ class Attribute extends Import
     /**
      * Create temporary table, load attributes data and insert in the temporary table.
      *
-     * @return void
-     *
      * @throws AlreadyExistsException
      * @throws Zend_Db_Statement_Exception
      */
@@ -177,7 +144,7 @@ class Attribute extends Import
         $api = $this->akeneoClient->getReferenceEntityAttributeApi();
         $entities = $this->referenceEntityHelper->getEntitiesToImport();
         foreach ($entities as $entityCode) {
-            $apiResult = $api->all((string)$entityCode);
+            $apiResult = $api->all((string) $entityCode);
             foreach ($apiResult as $attribute) {
                 if (!isset($attribute['code']) || in_array($attribute['code'], $this->excludedAttributes)) {
                     continue;
@@ -231,8 +198,6 @@ class Attribute extends Import
     /**
      * Check already imported entities are still in Magento.
      *
-     * @return void
-     *
      * @throws Zend_Db_Statement_Exception
      */
     public function checkEntities(): void
@@ -257,7 +222,6 @@ class Attribute extends Import
     /**
      * Match code with entity.
      *
-     * @return void
      * @throws LocalizedException
      */
     public function matchEntities(): void
@@ -291,8 +255,6 @@ class Attribute extends Import
 
     /**
      * Match type with Magento logic.
-     *
-     * @return void
      */
     public function matchType(): void
     {
@@ -323,8 +285,6 @@ class Attribute extends Import
     /**
      * Match attribute set.
      *
-     * @return void
-     *
      * @throws Zend_Db_Statement_Exception
      */
     public function matchAttributeSet(): void
@@ -350,7 +310,7 @@ class Attribute extends Import
             $connection->update(
                 $tmpTable,
                 [
-                    '_attribute_set_id' => $relation['attribute_set_id']
+                    '_attribute_set_id' => $relation['attribute_set_id'],
                 ],
                 $connection->prepareSqlCondition('code', $relation['code'])
             );
@@ -360,11 +320,8 @@ class Attribute extends Import
     /**
      * Create/update attributes.
      *
-     * @return void
-     *
      * @throws LocalizedException
      * @throws Zend_Db_Statement_Exception
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -420,7 +377,7 @@ class Attribute extends Import
                 array_keys($values)
             );
 
-            $frontendLabel = (!empty($row[$adminLabelColumn])) ? $row[$adminLabelColumn] : "PIM (". $row['code'] . ")";
+            $frontendLabel = !empty($row[$adminLabelColumn]) ? $row[$adminLabelColumn] : "PIM (" . $row['code'] . ")";
 
             /* Retrieve attribute scope */
             $global = ScopedAttributeInterface::SCOPE_GLOBAL; // Global
@@ -537,8 +494,6 @@ class Attribute extends Import
 
     /**
      * Drop temporary table.
-     *
-     * @return void
      */
     public function dropTable(): void
     {
@@ -547,8 +502,6 @@ class Attribute extends Import
 
     /**
      * Clean cache.
-     *
-     * @return void
      */
     public function cleanCache(): void
     {
@@ -569,7 +522,6 @@ class Attribute extends Import
     /**
      * Return type id for custom entity.
      *
-     * @return string|null
      * @throws LocalizedException
      */
     protected function getEntityTypeId(): ?string

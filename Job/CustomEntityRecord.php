@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Job;
 
@@ -43,57 +43,41 @@ class CustomEntityRecord extends Import
 
     /**
      * Import code.
-     *
-     * @var string $code
      */
     protected string $code = 'smile_custom_entity_record';
 
     /**
      * Import name.
-     *
-     * @var string $name
      */
     protected string $name = 'Smile Custom Entity Record';
 
     /**
      * Import config.
-     *
-     * @var ConfigManager
      */
     protected ConfigManager $configManager;
 
     /**
      * Cache type list.
-     *
-     * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
      * Store helper.
-     *
-     * @var StoreHelper
      */
     protected StoreHelper $storeHelper;
 
     /**
      * Reference entity helper.
-     *
-     * @var ReferenceEntity
      */
     protected ReferenceEntity $referenceEntityHelper;
 
     /**
      * Attribute tables.
-     *
-     * @var AttributeTables
      */
     protected AttributeTables $attributeTables;
 
     /**
      * Filter manager.
-     *
-     * @var FilterManager
      */
     protected FilterManager $filterManager;
 
@@ -102,27 +86,15 @@ class CustomEntityRecord extends Import
      *
      * @var string[]
      */
-    protected $defaultAttributes = [
+    protected array $defaultAttributes = [
         'label' => 'name',
-        'image' => 'image'
+        'image' => 'image',
     ];
 
     /**
      * Constructor.
      *
-     * @param OutputHelper $outputHelper
-     * @param ManagerInterface $eventManager
-     * @param Authenticator $authenticator
-     * @param Entities $entitiesHelper
-     * @param Config $configHelper
-     * @param ConfigManager $configManager
-     * @param TypeListInterface $cacheTypeList
-     * @param StoreHelper $storeHelper
-     * @param ReferenceEntity $referenceEntityHelper
-     * @param AttributeTables $attributeTables
-     * @param FilterManager $filterManager
      * @param array $data
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -158,8 +130,6 @@ class CustomEntityRecord extends Import
     /**
      * Create temporary table, load records and insert it in the temporary table.
      *
-     * @return void
-     *
      * @throws AlreadyExistsException
      * @throws Zend_Db_Exception
      * @throws Zend_Db_Statement_Exception
@@ -191,7 +161,7 @@ class CustomEntityRecord extends Import
                 $this->entitiesHelper->insertDataFromApi(
                     [
                         'code' => $record['code'],
-                        'entity' => $entity
+                        'entity' => $entity,
                     ],
                     $this->jobExecutor->getCurrentJob()->getCode()
                 );
@@ -220,8 +190,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Check already imported records are still in Magento.
-     *
-     * @return void
      *
      * @throws Zend_Db_Statement_Exception
      */
@@ -260,7 +228,7 @@ class CustomEntityRecord extends Import
 
         $akeneoConnectorTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
         $entityTable = $this->entitiesHelper->getTable(self::ENTITY_TABLE);
-        $deleteSelectQuery = $connection->select()
+        $deleteQuery = $connection->select()
             ->from(['ace' => $akeneoConnectorTable], null)
             ->joinLeft(
                 ['sce' => $entityTable],
@@ -269,18 +237,12 @@ class CustomEntityRecord extends Import
             )
             ->where("sce.entity_id IS NULL AND ace.import = 'smile_custom_entity_record'");
 
-        $connection->query(
-            $connection->deleteFromSelect(
-                $deleteSelectQuery,
-                $akeneoConnectorTable
-            )
-        );
+        // phpcs:ignore
+        $connection->query("DELETE ace $deleteQuery");
     }
 
     /**
      * Match code with entity
-     *
-     * @return void
      *
      * @throws Exception
      */
@@ -296,8 +258,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Add entity type.
-     *
-     * @return void
      */
     public function updateEntityType(): void
     {
@@ -318,7 +278,7 @@ class CustomEntityRecord extends Import
             $connection->update(
                 $tmpTable,
                 [
-                    '_attribute_set_id' => $type['entity_id']
+                    '_attribute_set_id' => $type['entity_id'],
                 ],
                 $connection->prepareSqlCondition('entity', $type['entity'])
             );
@@ -327,8 +287,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Create records.
-     *
-     * @return void
      */
     public function createEntities(): void
     {
@@ -355,8 +313,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Update column values for options.
-     *
-     * @return void
      */
     public function updateOption(): void
     {
@@ -382,12 +338,12 @@ class CustomEntityRecord extends Import
             $connection->update(
                 $tmpTable,
                 [
-                    'data' => $option['entity_id']
+                    'data' => $option['entity_id'],
                 ],
                 [
                     'record = ?' => $option['record'],
                     'attribute = ?' => $option['attribute'],
-                    $option['locale'] ? 'locale = "' . $option['locale'] . '"' : 'locale IS NULL'
+                    $option['locale'] ? 'locale = "' . $option['locale'] . '"' : 'locale IS NULL',
                 ]
             );
         }
@@ -395,8 +351,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Update column values for multiselect attributes.
-     *
-     * @return void
      */
     public function updateMultiselectValues(): void
     {
@@ -428,11 +382,11 @@ class CustomEntityRecord extends Import
             $connection->update(
                 $tmpTable,
                 [
-                    'data' => implode(",", $multiselectValue)
+                    'data' => implode(",", $multiselectValue),
                 ],
                 [
                     'record = ?' => $attribute['record'],
-                    'attribute = ?' => $attribute['attribute']
+                    'attribute = ?' => $attribute['attribute'],
                 ]
             );
         }
@@ -440,8 +394,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Insert entity attribute values.
-     *
-     * @return void
      *
      * @throws LocalizedException
      */
@@ -474,8 +426,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Update url key.
-     *
-     * @return void
      *
      * @throws LocalizedException
      */
@@ -525,8 +475,6 @@ class CustomEntityRecord extends Import
 
     /**
      * Set status for new records.
-     *
-     * @return void
      */
     public function setIsActiveValues(): void
     {
@@ -565,8 +513,6 @@ class CustomEntityRecord extends Import
     /**
      * Load and save media.
      *
-     * @return void
-     *
      * @throws AlreadyExistsException
      * @throws FileSystemException
      */
@@ -594,18 +540,14 @@ class CustomEntityRecord extends Import
 
     /**
      * Drop temporary table.
-     *
-     * @return void
      */
-    public function dropTable()
+    public function dropTable(): void
     {
         $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
     }
 
     /**
      * Clean cache.
-     *
-     * @return void
      */
     public function cleanCache(): void
     {
@@ -625,15 +567,10 @@ class CustomEntityRecord extends Import
 
     /**
      * Create attribute code based on entity code.
-     *
-     * @param string $entity
-     * @param string $attributeCode
-     *
-     * @return string
      */
     protected function getAttributeCode(string $entity, string $attributeCode): string
     {
-        return (key_exists($attributeCode, $this->defaultAttributes))
+        return key_exists($attributeCode, $this->defaultAttributes)
             ? $this->defaultAttributes[$attributeCode]
             : $entity . '_' . $attributeCode;
     }
@@ -642,10 +579,6 @@ class CustomEntityRecord extends Import
      * Insert attribute values.
      *
      * @param array $attributes
-     * @param int $storeId
-     * @param int $entityTypeId
-     *
-     * @return void
      */
     protected function setAttributesValue(array $attributes, int $storeId, int $entityTypeId): void
     {
@@ -657,8 +590,10 @@ class CustomEntityRecord extends Import
                 $entityTypeId
             );
 
-            if (empty($attribute) || !isset($attribute[AttributeInterface::BACKEND_TYPE])
-                || $attribute[AttributeInterface::BACKEND_TYPE] === 'static') {
+            if (
+                empty($attribute) || !isset($attribute[AttributeInterface::BACKEND_TYPE])
+                || $attribute[AttributeInterface::BACKEND_TYPE] === 'static'
+            ) {
                 continue;
             }
 

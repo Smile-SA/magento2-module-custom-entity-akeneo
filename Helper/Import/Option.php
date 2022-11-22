@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Helper\Import;
 
+use Akeneo\Connector\Helper\Authenticator;
 use Akeneo\Connector\Helper\Config as ConfigHelper;
 use Akeneo\Connector\Helper\Import\Entities;
 use Akeneo\Connector\Helper\Store as StoreHelper;
@@ -23,20 +24,11 @@ class Option extends Entities
 {
     /**
      * Store helper.
-     *
-     * @var StoreHelper
      */
     protected StoreHelper $storeHelper;
 
     /**
      * Constructor.
-     *
-     * @param ResourceConnection $connection
-     * @param DeploymentConfig $deploymentConfig
-     * @param BaseProductModel $product
-     * @param ConfigHelper $configHelper
-     * @param LoggerInterface $logger
-     * @param StoreHelper $storeHelper
      */
     public function __construct(
         ResourceConnection $connection,
@@ -44,6 +36,7 @@ class Option extends Entities
         BaseProductModel $product,
         ConfigHelper $configHelper,
         LoggerInterface $logger,
+        Authenticator $authenticator,
         StoreHelper $storeHelper
     ) {
         parent::__construct(
@@ -51,7 +44,8 @@ class Option extends Entities
             $deploymentConfig,
             $product,
             $configHelper,
-            $logger
+            $logger,
+            $authenticator
         );
         $this->storeHelper = $storeHelper;
     }
@@ -59,14 +53,7 @@ class Option extends Entities
     /**
      * Match Magento ID with code.
      *
-     * @param string $pimKey
-     * @param string $entityTable
-     * @param string $entityKey
-     * @param string $import
-     * @param string|null $prefix
-     *
      * @return $this
-     *
      * @throws LocalizedException
      * @throws Zend_Db_Statement_Exception
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -76,7 +63,7 @@ class Option extends Entities
         string $entityTable,
         string $entityKey,
         string $import,
-        string $prefix = null
+        ?string $prefix = null
     ): self {
         $localeCode = $this->storeHelper->getAdminLang();
         $connection = $this->connection;
@@ -124,7 +111,6 @@ class Option extends Entities
         $entitiesToCreate = array_diff($existingMagentoOptionIds, $existingEntities);
 
         foreach ($entitiesToCreate as $entityToCreateKey => $entityOptionId) {
-
             $currentEntity = $existingMagentoOptions[$entityToCreateKey];
             $values = [
                 'import'    => $import,
@@ -134,8 +120,8 @@ class Option extends Entities
             $connection->insertOnDuplicate($akeneoConnectorTable, $values);
         }
 
-        $sql = '
-            UPDATE `' . $tableName . '` t
+        // phpcs:ignore
+        $sql = 'UPDATE `' . $tableName . '` t
             SET `_entity_id` = (
                 SELECT `entity_id` FROM `' . $akeneoConnectorTable . '` c
                 WHERE ' . ($prefix
@@ -152,7 +138,7 @@ class Option extends Entities
         $query = $connection->query('SHOW TABLE STATUS LIKE "' . $entityTable . '"');
         $row = $query->fetch();
 
-        $connection->query('SET @id = ' . (int)$row['Auto_increment']);
+        $connection->query('SET @id = ' . (int) $row['Auto_increment']);
         $values = [
             '_entity_id' => new Expr('@id := @id + 1'),
             '_is_new'    => new Expr('1'),
@@ -187,8 +173,10 @@ class Option extends Entities
             $maxEntity = $connection->fetchOne(
                 $connection->select()->from($entityTable, new Expr('MAX(`' . $entityKey . '`)'))
             );
+
             $connection->query(
-                'ALTER TABLE `' . $entityTable . '` AUTO_INCREMENT = ' . (max((int)$maxCode, (int)$maxEntity) + 1)
+                    // phpcs:ignore
+                'ALTER TABLE `' . $entityTable . '` AUTO_INCREMENT = ' . (max((int) $maxCode, (int) $maxEntity) + 1)
             );
         }
 

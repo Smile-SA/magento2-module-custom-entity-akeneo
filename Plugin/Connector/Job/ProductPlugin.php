@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Plugin\Connector\Job;
 
@@ -16,31 +16,21 @@ class ProductPlugin
 {
     /**
      * Entities helper.
-     *
-     * @var Entities
      */
     protected Entities $entitiesHelper;
 
     /**
      * Custom entity product link management.
-     *
-     * @var CustomEntityProductLinkManagement
      */
     protected CustomEntityProductLinkManagement $customEntityProductLinkManagement;
 
     /**
      * Akeneo config helper.
-     *
-     * @var Config $configHelper
      */
     protected Config $configHelper;
 
     /**
      * Constructor.
-     *
-     * @param Entities $entitiesHelper
-     * @param CustomEntityProductLinkManagement $customEntityProductLinkManagement
-     * @param Config $configHelper
      */
     public function __construct(
         Entities $entitiesHelper,
@@ -54,10 +44,6 @@ class ProductPlugin
 
     /**
      * Set custom entities product links.
-     *
-     * @param Product $productJob
-     *
-     * @return void
      */
     public function afterSetValues(Product $productJob): void
     {
@@ -75,7 +61,8 @@ class ProductPlugin
 
             $columns = array_keys($connection->describeTable($productTmpTable));
             foreach ($columns as $column) {
-                if (!key_exists($column, $customEntityAttributes)
+                if (
+                    !key_exists($column, $customEntityAttributes)
                     || !$connection->tableColumnExists($productTmpTable, $column)
                 ) {
                     continue;

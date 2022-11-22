@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Plugin\Connector\Job;
 
@@ -19,31 +19,21 @@ class AttributePlugin
 {
     /**
      * Entities helper.
-     *
-     * @var Entities
      */
     protected Entities $entitiesHelper;
 
     /**
      * Eav setup.
-     *
-     * @var EavSetup
      */
     protected EavSetup $eavSetup;
 
     /**
      * Akeneo config helper.
-     *
-     * @var Config $configHelper
      */
     protected Config $configHelper;
 
     /**
      * Constructor.
-     *
-     * @param Entities $entitiesHelper
-     * @param EavSetup $eavSetup
-     * @param Config $configHelper
      */
     public function __construct(
         Entities $entitiesHelper,
@@ -57,10 +47,6 @@ class AttributePlugin
 
     /**
      * Add type to smile_custom_entity product attributes.
-     *
-     * @param Attribute $attributeJob
-     *
-     * @return void
      *
      * @throws LocalizedException
      */
@@ -88,7 +74,7 @@ class AttributePlugin
                     }
                     $values = [
                         'is_html_allowed_on_front' => 1,
-                        'custom_entity_attribute_set_id' => $customEntityTypeId
+                        'custom_entity_attribute_set_id' => $customEntityTypeId,
                     ];
                     $this->eavSetup->updateAttribute(
                         $productEntityTypeId,

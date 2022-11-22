@@ -1,20 +1,20 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Job;
 
 use Akeneo\Connector\Helper\Authenticator;
 use Akeneo\Connector\Helper\Config as AkeneoConfig;
 use Akeneo\Connector\Helper\Import\Entities;
-use Akeneo\Connector\Helper\Store as StoreHelper;
-use Magento\Framework\Exception\AlreadyExistsException;
-use Magento\Framework\Exception\LocalizedException;
-use Smile\CustomEntityAkeneo\Helper\Import\Option as OptionHelper;
 use Akeneo\Connector\Helper\Output as OutputHelper;
+use Akeneo\Connector\Helper\Store as StoreHelper;
 use Akeneo\Connector\Job\Import;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\LocalizedException;
+use Smile\CustomEntityAkeneo\Helper\Import\Option as OptionHelper;
 use Smile\CustomEntityAkeneo\Helper\Import\ReferenceEntity;
 use Smile\CustomEntityAkeneo\Model\ConfigManager;
 use Zend_Db_Exception;
@@ -30,68 +30,43 @@ class Option extends Import
 {
     /**
      * Import code.
-     *
-     * @var string $code
      */
     protected string $code = 'smile_custom_entity_attribute_option';
 
     /**
      * Import name.
-     *
-     * @var string $name
      */
     protected string $name = 'Smile Custom Entity Attribute Option';
 
     /**
      * Cache type list.
-     *
-     * @var TypeListInterface
      */
     protected TypeListInterface $cacheTypeList;
 
     /**
      * Import config.
-     *
-     * @var ConfigManager
      */
     protected ConfigManager $configManager;
 
     /**
      * Options helper.
-     *
-     * @var OptionHelper
      */
     protected OptionHelper $optionHelper;
 
     /**
      * Store helper.
-     *
-     * @var StoreHelper
      */
     protected StoreHelper $storeHelper;
 
     /**
      * Reference entity helper.
-     *
-     * @var ReferenceEntity
      */
     protected ReferenceEntity $referenceEntityHelper;
 
     /**
      * Construct.
      *
-     * @param OutputHelper $outputHelper
-     * @param ManagerInterface $eventManager
-     * @param Authenticator $authenticator
-     * @param Entities $entitiesHelper
-     * @param AkeneoConfig $akeneoConfig
-     * @param ConfigManager $configManager
-     * @param TypeListInterface $cacheTypeList
-     * @param OptionHelper $optionHelper
-     * @param StoreHelper $storeHelper
-     * @param ReferenceEntity $referenceEntityHelper
      * @param array $data
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -125,12 +100,9 @@ class Option extends Import
     /**
      * Create temporary table, load options and insert it in the temporary table.
      *
-     * @return void
-     *
      * @throws AlreadyExistsException
      * @throws Zend_Db_Exception
      * @throws Zend_Db_Statement_Exception
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function loadOptions(): void
@@ -156,7 +128,7 @@ class Option extends Import
         );
 
         foreach ($entities as $entityCode) {
-            $attributeApiResult = $attributeApi->all((string)$entityCode);
+            $attributeApiResult = $attributeApi->all((string) $entityCode);
             foreach ($attributeApiResult as $attribute) {
                 if ($attribute['type'] == 'single_option' || $attribute['type'] == 'multiple_options') {
                     $optionsApiResult = $attributeOptionApi->all((string) $entityCode, (string) $attribute['code']);
@@ -205,8 +177,6 @@ class Option extends Import
     /**
      * Check already imported entities are still in Magento.
      *
-     * @return void
-     *
      * @throws Zend_Db_Statement_Exception
      */
     public function checkEntities(): void
@@ -226,8 +196,6 @@ class Option extends Import
     /**
      * Match code with entity.
      *
-     * @return void
-     *
      * @throws Zend_Db_Statement_Exception
      * @throws LocalizedException
      */
@@ -244,8 +212,6 @@ class Option extends Import
 
     /**
      * Create/update options.
-     *
-     * @return void
      */
     public function insertOptions(): void
     {
@@ -278,8 +244,6 @@ class Option extends Import
     /**
      * Create/update option values.
      *
-     * @return void
-     *
      * @throws LocalizedException
      */
     public function insertValues(): void
@@ -293,7 +257,7 @@ class Option extends Import
                 continue;
             }
             foreach ($data as $store) {
-                $value = ($store['store_id'] == 0) ? 'labels-' . $adminLang : 'labels-' . $local;
+                $value = $store['store_id'] == 0 ? 'labels-' . $adminLang : 'labels-' . $local;
                 $options = $connection->select()->from(
                     ['a' => $tmpTable],
                     [
@@ -305,7 +269,7 @@ class Option extends Import
                     ['b' => $this->entitiesHelper->getTable('akeneo_connector_entities')],
                     'a.attribute = b.code AND b.import = "smile_custom_entity_attribute"',
                     []
-                )->where('`a`.`'. $value . '` IS NOT NULL ');
+                )->where('`a`.`' . $value . '` IS NOT NULL ');
                 $connection->query(
                     $connection->insertFromSelect(
                         $options,
@@ -320,8 +284,6 @@ class Option extends Import
 
     /**
      * Drop temporary table.
-     *
-     * @return void
      */
     public function dropTable(): void
     {
@@ -330,8 +292,6 @@ class Option extends Import
 
     /**
      * Clean cache.
-     *
-     * @return void
      */
     public function cleanCache(): void
     {

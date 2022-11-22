@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Model\Source\Config;
 
@@ -15,23 +15,16 @@ class ReferenceEntities implements OptionSourceInterface
 {
     /**
      * Authenticator.
-     *
-     * @var Authenticator $akeneoAuthenticator
      */
     protected Authenticator $akeneoAuthenticator;
 
     /**
      * Logger.
-     *
-     * @var Logger $logger
      */
     protected Logger $logger;
 
     /**
      * Constructor.
-     *
-     * @param Authenticator $akeneoAuthenticator
-     * @param Logger $logger
      */
     public function __construct(
         Authenticator $akeneoAuthenticator,

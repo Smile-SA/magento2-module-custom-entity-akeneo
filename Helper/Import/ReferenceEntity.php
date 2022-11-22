@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Helper\Import;
 
+use Akeneo\Connector\Helper\Authenticator;
 use Akeneo\Connector\Helper\Config as ConfigHelper;
 use Akeneo\Connector\Helper\Import\Entities;
 use Magento\Catalog\Model\Product as BaseProductModel;
@@ -22,20 +23,11 @@ class ReferenceEntity extends Entities
 {
     /**
      * Config.
-     *
-     * @var ConfigManager
      */
     protected ConfigManager $configManager;
 
     /**
      * Constructor.
-     *
-     * @param ResourceConnection $connection
-     * @param DeploymentConfig $deploymentConfig
-     * @param BaseProductModel $product
-     * @param ConfigHelper $configHelper
-     * @param LoggerInterface $logger
-     * @param ConfigManager $configManager
      */
     public function __construct(
         ResourceConnection $connection,
@@ -43,6 +35,7 @@ class ReferenceEntity extends Entities
         BaseProductModel $product,
         ConfigHelper $configHelper,
         LoggerInterface $logger,
+        Authenticator $authenticator,
         ConfigManager $configManager
     ) {
         parent::__construct(
@@ -50,7 +43,8 @@ class ReferenceEntity extends Entities
             $deploymentConfig,
             $product,
             $configHelper,
-            $logger
+            $logger,
+            $authenticator
         );
         $this->configManager = $configManager;
     }
@@ -59,7 +53,6 @@ class ReferenceEntity extends Entities
      * Return reference entities to import depends on configuration and imported entities.
      *
      * @return array
-     *
      * @throws Zend_Db_Statement_Exception
      */
     public function getEntitiesToImport(): array
@@ -84,9 +77,8 @@ class ReferenceEntity extends Entities
      * Retrieve attribute.
      *
      * @param string $code
-     * @param int    $entityTypeId
-     *
-     * @return bool|array
+     * @param int $entityTypeId
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function getAttribute($code, $entityTypeId): bool|array
     {
@@ -98,7 +90,7 @@ class ReferenceEntity extends Entities
                 [
                     AttributeInterface::ATTRIBUTE_ID,
                     AttributeInterface::BACKEND_TYPE,
-                    AttributeInterface::FRONTEND_INPUT
+                    AttributeInterface::FRONTEND_INPUT,
                 ]
             )->where(AttributeInterface::ENTITY_TYPE_ID . ' = ?', $entityTypeId)->where(
                 AttributeInterface::ATTRIBUTE_CODE . ' = ?',
