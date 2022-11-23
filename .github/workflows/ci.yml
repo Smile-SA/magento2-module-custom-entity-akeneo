@@ -23,7 +23,7 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.AKENEO_SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          known_hosts: ${{ secrets.AKENEO_KNOWN_HOSTS }}
 
       - name: 'Install PHP'
         uses: 'shivammathur/setup-php@v2'

@@ -1,16 +1,23 @@
 ## Module Install
 
-Into Magento2 folder, use [composer](https://getcomposer.org/) for install this module :
+The module can be installed with [composer](https://getcomposer.org/).
 
-`composer install smile/module-custom-entity-akeneo`
+To install this module, run the following command at the root directory of your Magento installation:
 
-Now, let’s finish the installation process:
+```shell
+composer install smile/module-custom-entity-akeneo
+```
 
-`bin/magento setup:upgrade`
+Then, run the following command:
 
-Congrats, this module is now installed.
+```
+bin/magento setup:upgrade
+```
+
+The module is now installed.
 
 ## Required modules
-* [Smile Custom Entity](https://github.com/Smile-SA/magento2-module-custom-entity)
-* [Smile Custom Entity Product Link](https://github.com/Smile-SA/magento2-module-custom-entity-product-link)
-* [Akeneo Connector Enterprise](https://apps.akeneo.com/extension/akeneo-connector-magento-2-enterprise-edition)                                                                    
+
+- [Smile Custom Entity](https://github.com/Smile-SA/magento2-module-custom-entity)
+- [Smile Custom Entity Product Link](https://github.com/Smile-SA/magento2-module-custom-entity-product-link)
+- [Akeneo Connector Enterprise](https://apps.akeneo.com/extension/akeneo-connector-magento-2-enterprise-edition)

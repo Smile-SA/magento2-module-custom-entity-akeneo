@@ -17,6 +17,8 @@ use Zend_Db_Expr as Expr;
 
 /**
  * Options import helper.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
 class Option extends Entities
 {
