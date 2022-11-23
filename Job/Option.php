@@ -14,7 +14,7 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
-use Smile\CustomEntityAkeneo\Helper\Import\Option as OptionHelper;
+use Smile\CustomEntity\Api\Data\CustomEntityInterface;
 use Smile\CustomEntityAkeneo\Helper\Import\ReferenceEntity;
 use Smile\CustomEntityAkeneo\Model\ConfigManager;
 use Zend_Db_Exception;
@@ -49,7 +49,6 @@ class Option extends Import
         AkeneoConfig $akeneoConfig,
         protected ConfigManager $configManager,
         protected TypeListInterface $cacheTypeList,
-        protected OptionHelper $optionHelper,
         protected StoreHelper $storeHelper,
         protected ReferenceEntity $referenceEntityHelper,
         array $data = []
@@ -162,19 +161,17 @@ class Option extends Import
 
     /**
      * Match code with entity.
-     *
-     * @throws Zend_Db_Statement_Exception
-     * @throws LocalizedException
      */
     public function matchEntities(): void
     {
-        $this->optionHelper->matchEntity(
-            'code',
-            'eav_attribute_option',
-            'option_id',
-            $this->jobExecutor->getCurrentJob()->getCode(),
-            'attribute'
-        );
+        // Clear entities with empty code
+        $connection = $this->entitiesHelper->getConnection();
+        $tableName = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $connection->delete($tableName, ['code = ?' => '']);
+
+        // Connect akeneo entities code with magento options entity_id.
+        $this->matchOptionsId();
+        $this->matchNewOptionsId();
     }
 
     /**
@@ -274,5 +271,126 @@ class Option extends Import
         $this->jobExecutor->setMessage(
             __('Cache cleaned for: %1', join(', ', array_intersect_key($cacheTypeLabels, array_flip($types))))
         );
+    }
+
+    /**
+     * Connect existing Magento options to Akeneo items.
+     */
+    protected function matchOptionsId(): void
+    {
+        $localeCode = $this->storeHelper->getAdminLang();
+        $connection = $this->entitiesHelper->getConnection();
+        $tableName = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $akeneoConnectorTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
+        $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
+
+        $select = $connection->select()
+            ->from($akeneoConnectorTable, ['entity_id' => 'entity_id'])
+            ->where('import = ?', $this->jobExecutor->getCurrentJob()->getCode());
+
+        $existingEntities = $connection->query($select)->fetchAll();
+        $existingEntities = array_column($existingEntities, 'entity_id');
+
+        $columnToSelect = ['label' => 't.labels-' . $localeCode, 'code' => 't.code', 'attribute' => 't.attribute'];
+        $condition = '`labels-' . $localeCode . '` = e.value';
+
+        $select = $connection->select()->from(
+            ['t' => $tableName],
+            $columnToSelect
+        )->joinInner(
+            ['e' => 'eav_attribute_option_value'],
+            $condition,
+            []
+        )->joinInner(
+            ['o' => 'eav_attribute_option'],
+            'o.`option_id` = e.`option_id`',
+            ['option_id']
+        )->joinInner(
+            ['a' => 'eav_attribute'],
+            'o.`attribute_id` = a.`attribute_id` AND t.`attribute` = a.`attribute_code`',
+            []
+        )->where('e.store_id = ?', 0)->where('a.entity_type_id', $entityTypeId);
+
+        $existingMagentoOptions = $connection->query($select)->fetchAll();
+        $existingMagentoOptionIds = array_column($existingMagentoOptions, 'option_id');
+        $entitiesToCreate = array_diff($existingMagentoOptionIds, $existingEntities);
+
+        foreach ($entitiesToCreate as $entityToCreateKey => $entityOptionId) {
+            $currentEntity = $existingMagentoOptions[$entityToCreateKey];
+            $values = [
+                'import' => $this->jobExecutor->getCurrentJob()->getCode(),
+                'code' => $currentEntity['attribute'] . '-' . $currentEntity['code'],
+                'entity_id' => $entityOptionId,
+            ];
+            $connection->insertOnDuplicate($akeneoConnectorTable, $values);
+        }
+
+        // phpcs:ignore
+        $sql = 'UPDATE `' . $tableName . '` t
+            SET `_entity_id` = (
+                SELECT `entity_id` FROM `' . $akeneoConnectorTable . '` c
+                WHERE CONCAT(t.`attribute`, "-", t.`code`) = c.`code`
+                AND c.`import` = "' . $this->jobExecutor->getCurrentJob()->getCode() . '"
+            )
+        ';
+        $connection->query($sql);
+    }
+
+    /**
+     * Set entity_id for new entities and update akeneo_connector_entities table with code and new entity_id.
+     */
+    protected function matchNewOptionsId(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $tableName = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $akeneoConnectorTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
+        $entityTable = $this->entitiesHelper->getTable('eav_attribute_option');
+
+        // Set entity_id for new entities
+        $query = $connection->query('SHOW TABLE STATUS LIKE "' . $entityTable . '"');
+        $row = $query->fetch();
+
+        $connection->query('SET @id = ' . (int) $row['Auto_increment']);
+        $values = [
+            '_entity_id' => new Expr('@id := @id + 1'),
+            '_is_new' => new Expr('1'),
+        ];
+        $connection->update($tableName, $values, '_entity_id IS NULL');
+
+        // Update akeneo_connector_entities table with code and new entity_id
+        $select = $connection->select()->from(
+            $tableName,
+            [
+                'import' => new Expr("'" . $this->jobExecutor->getCurrentJob()->getCode() . "'"),
+                'code' => new Expr('CONCAT(`attribute`, "-", `code`)'),
+                'entity_id' => '_entity_id',
+            ]
+        )->where('_is_new = ?', 1);
+
+        $connection->query(
+            $connection->insertFromSelect($select, $akeneoConnectorTable, ['import', 'code', 'entity_id'], 2)
+        );
+
+        // Update entity table auto increment
+        $count = $connection->fetchOne(
+            $connection->select()->from($tableName, [new Expr('COUNT(*)')])->where('_is_new = ?', 1)
+        );
+
+        if ($count) {
+            $maxCode = $connection->fetchOne(
+                $connection->select()->from($akeneoConnectorTable, new Expr('MAX(`entity_id`)'))->where(
+                    'import = ?',
+                    $this->jobExecutor->getCurrentJob()->getCode()
+                )
+            );
+            $maxEntity = $connection->fetchOne(
+                $connection->select()->from($entityTable, new Expr('MAX(`option_id`)'))
+            );
+
+            $connection->query(
+            // phpcs:ignore
+                'ALTER TABLE `' . $entityTable . '` AUTO_INCREMENT = ' . (max((int) $maxCode, (int) $maxEntity) + 1)
+            );
+        }
     }
 }
