@@ -251,7 +251,7 @@ class Option extends Import
      */
     public function dropTable(): void
     {
-        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
+//        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
     }
 
     /**
@@ -325,15 +325,13 @@ class Option extends Import
             $connection->insertOnDuplicate($akeneoConnectorTable, $values);
         }
 
-        // phpcs:ignore
-        $sql = 'UPDATE `' . $tableName . '` t
-            SET `_entity_id` = (
-                SELECT `entity_id` FROM `' . $akeneoConnectorTable . '` c
-                WHERE CONCAT(t.`attribute`, "-", t.`code`) = c.`code`
-                AND c.`import` = "' . $this->jobExecutor->getCurrentJob()->getCode() . '"
-            )
-        ';
-        $connection->query($sql);
+        $select = $connection->select()
+            ->from(['c' => $akeneoConnectorTable], ['_entity_id' => 'entity_id'])
+            ->where('CONCAT(t.`attribute`, "-", t.`code`) = c.`code`')
+            ->where('c.`import` = ?', $this->jobExecutor->getCurrentJob()->getCode());
+        $update = $connection->updateFromSelect($select, ['t' => $tableName]);
+
+        $connection->query($update);
     }
 
     /**

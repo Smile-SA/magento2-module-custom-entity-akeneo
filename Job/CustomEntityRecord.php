@@ -186,18 +186,19 @@ class CustomEntityRecord extends Import
         }
 
         $akeneoConnectorTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
-        $entityTable = $this->entitiesHelper->getTable(self::ENTITY_TABLE);
-        $deleteQuery = $connection->select()
-            ->from(['ace' => $akeneoConnectorTable], null)
-            ->joinLeft(
-                ['sce' => $entityTable],
-                "ace.entity_id = sce.entity_id",
-                []
-            )
-            ->where("sce.entity_id IS NULL AND ace.import = 'smile_custom_entity_record'");
+        $deleteQuery = $connection->deleteFromSelect(
+            $connection->select()
+                ->from(['ace' => $akeneoConnectorTable], null)
+                ->joinLeft(
+                    ['sce' => $this->entitiesHelper->getTable(self::ENTITY_TABLE)],
+                    "ace.entity_id = sce.entity_id",
+                    []
+                )
+                ->where("sce.entity_id IS NULL AND ace.import = 'smile_custom_entity_record'"),
+            'ace'
+        );
 
-        // phpcs:ignore
-        $connection->query("DELETE ace $deleteQuery");
+        $connection->query($deleteQuery);
     }
 
     /**
