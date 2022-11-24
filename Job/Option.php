@@ -251,7 +251,7 @@ class Option extends Import
      */
     public function dropTable(): void
     {
-//        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
+        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
     }
 
     /**
