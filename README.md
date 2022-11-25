@@ -1,6 +1,8 @@
-# magento2-module-custom-entity-akeneo
+# Akeneo's Reference Entity to Magento Custom Entity
 
-Import Akeneo's Reference Entities into Smile Custom Entity module
+## What is this module ?
+
+Import Akeneo's Reference Entities into Smile Custom Entity module.
 
 ## Who is developing this module ?
 
@@ -16,7 +18,8 @@ Together we explore, invent, and test technologies of the future, to better serv
 
 ## Main Features
 
-Import reference entity, attributes, options and records into Smile Custom Entity module.
+It imports the Akeneo's References Entities, and the associated attributes, options, records and medias into Smile Custom Entity module.
+A configuration lets you the possibility to choose which entities you want to import.
 
 ## Documentation
 
