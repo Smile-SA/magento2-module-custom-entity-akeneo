@@ -3,13 +3,13 @@
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="akeneo_connector">
-            <group id="smile_custom_entity" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>Smile custom entity</label>
+            <group id="smile_custom_entity" translate="label" type="text" sortOrder="41" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Smile Custom Entity</label>
                 <field id="mode" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Import Reference Entities</label>
                     <source_model>Smile\CustomEntityAkeneo\Model\Source\Config\Mode</source_model>
                 </field>
-                <field id="reference_entities" translate="label comment" type="multiselect" sortOrder="140" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="reference_entities" translate="label comment" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Reference Entities to import</label>
                     <source_model>Smile\CustomEntityAkeneo\Model\Source\Config\ReferenceEntities</source_model>
                     <comment>
