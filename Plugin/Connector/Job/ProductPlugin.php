@@ -50,13 +50,15 @@ class ProductPlugin
                     $select = $connection->select()->from($productTmpTable, ['_entity_id', $column]);
                     $products = $connection->fetchAssoc($select);
                     foreach ($products as $id => $productData) {
-                        $values = explode(",", $productData[$column]);
-                        $valueIdSelect = $connection->select()
-                            ->from($entityTable, ['entity_id'])
-                            ->where('code IN (?)', $values)
-                            ->where('import = "smile_custom_entity_record"');
-                        $valueIds = $connection->fetchCol($valueIdSelect);
-
+                        $valueIds = [];
+                        if ($productData[$column] && is_string($productData[$column])) {
+                            $values = explode(",", $productData[$column]);
+                            $valueIdSelect = $connection->select()
+                                ->from($entityTable, ['entity_id'])
+                                ->where('code IN (?)', $values)
+                                ->where('import = "smile_custom_entity_record"');
+                            $valueIds = $connection->fetchCol($valueIdSelect);
+                        }
                         $this->customEntityProductLinkManagement->saveLinks(
                             $id,
                             $customEntityAttributes[$column]['attribute_id'],
