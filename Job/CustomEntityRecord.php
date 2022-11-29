@@ -36,9 +36,10 @@ class CustomEntityRecord extends Import
 {
     /**
      * #@+
-     * Custom entity table.
+     * Table names.
      */
     public const ENTITY_TABLE = 'smile_custom_entity';
+    public const TMP_TABLE_ATTRIBUTE_VALUES = 'custom_entity_record_attribute';
     /**#@-*/
 
     /**
@@ -109,7 +110,7 @@ class CustomEntityRecord extends Import
         );
         $this->entitiesHelper->createTmpTable(
             ['record', 'attribute', 'locale', 'data'],
-            'custom_entity_record_attribute'
+            self::TMP_TABLE_ATTRIBUTE_VALUES
         );
 
         $api = $this->akeneoClient->getReferenceEntityRecordApi();
@@ -120,6 +121,7 @@ class CustomEntityRecord extends Import
                 $this->entitiesHelper->insertDataFromApi(
                     [
                         'code' => $record['code'],
+                        'akeneo_entity_code' => $entity . '-' . $record['code'],
                         'entity' => $entity,
                     ],
                     $this->jobExecutor->getCurrentJob()->getCode()
@@ -135,7 +137,7 @@ class CustomEntityRecord extends Import
                                 'data' => $attributeValue['data'],
 
                             ],
-                            'custom_entity_record_attribute'
+                            self::TMP_TABLE_ATTRIBUTE_VALUES
                         );
                     }
                 }
@@ -155,23 +157,20 @@ class CustomEntityRecord extends Import
     public function checkEntities(): void
     {
         $connection = $this->entitiesHelper->getConnection();
-
         $adminLang = $this->storeHelper->getAdminLang();
-        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
-        $tmpAttributeTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
 
         $selectNotEmpty = $connection->select()
-            ->from($tmpAttributeTable, 'record')
+            ->from($this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES), 'record')
             ->where('attribute = ?', 'name')
             ->where('locale = ?', $adminLang);
 
         $notEmptyNameRecords = array_column($connection->query($selectNotEmpty)->fetchAll(), 'record');
-        $connection->delete(
-            $tmpTable,
+        $deletedRecords = $connection->delete(
+            $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode()),
             ['code NOT IN (?)' => $notEmptyNameRecords]
         );
         $connection->delete(
-            $tmpAttributeTable,
+            $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES),
             ['record NOT IN (?)' => $notEmptyNameRecords]
         );
 
@@ -179,7 +178,7 @@ class CustomEntityRecord extends Import
             $this->jobExecutor->setAdditionalMessage(
                 __(
                     '%1 record(s) was removed from the import due to an empty name for the default locale %2',
-                    implode(", ", $notEmptyNameRecords),
+                    $deletedRecords,
                     $adminLang
                 )
             );
@@ -209,7 +208,7 @@ class CustomEntityRecord extends Import
     public function matchEntities(): void
     {
         $this->entitiesHelper->matchEntity(
-            'code',
+            'akeneo_entity_code',
             self::ENTITY_TABLE,
             'entity_id',
             $this->jobExecutor->getCurrentJob()->getCode()
@@ -260,10 +259,10 @@ class CustomEntityRecord extends Import
             'updated_at' => new Expr('now()'),
         ];
 
-        $parents = $connection->select()->from($tmpTable, $values);
+        $records = $connection->select()->from($tmpTable, $values);
 
         $query = $connection->insertFromSelect(
-            $parents,
+            $records,
             $table,
             array_keys($values),
             AdapterInterface::INSERT_ON_DUPLICATE
@@ -277,12 +276,11 @@ class CustomEntityRecord extends Import
     public function updateOption(): void
     {
         $connection = $this->entitiesHelper->getConnection();
-        $tmpTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
+        $tmpTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
         $attributeTable = $this->entitiesHelper->getTable('eav_attribute');
         $entityTypeTable = $this->entitiesHelper->getTable('eav_entity_type');
 
-        // Update "select" options
         $select = $connection->select()
             ->from(['tmp' => $tmpTable], ['record', 'attribute', 'locale'])
             ->joinLeft(['ace' => $entityTable], 'ace.code = CONCAT(tmp.attribute,"-",tmp.data)', ['entity_id'])
@@ -315,7 +313,7 @@ class CustomEntityRecord extends Import
     public function updateMultiselectValues(): void
     {
         $connection = $this->entitiesHelper->getConnection();
-        $tmpTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
+        $tmpTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
         $attributeTable = $this->entitiesHelper->getTable('eav_attribute');
         $entityTypeTable = $this->entitiesHelper->getTable('eav_entity_type');
@@ -359,10 +357,9 @@ class CustomEntityRecord extends Import
      */
     public function setValues(): void
     {
-
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
-        $tmpAttributeTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
+        $tmpAttributeTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $entityTypeId = (int) $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
 
         // Insert global attributes
@@ -393,7 +390,7 @@ class CustomEntityRecord extends Import
     {
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
-        $tmpAttributeTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
+        $tmpAttributeTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
         $urlAttribute = $this->referenceEntityHelper->getAttribute(
             CustomEntityInterface::URL_KEY,
@@ -479,7 +476,7 @@ class CustomEntityRecord extends Import
     public function importMedia(): void
     {
         $connection = $this->entitiesHelper->getConnection();
-        $tmpAttributeTable = $this->entitiesHelper->getTableName('custom_entity_record_attribute');
+        $tmpAttributeTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $select = $connection->select()
             ->from(['a' => $tmpAttributeTable], ['attribute', 'data'])
             ->where('a.attribute = "image"');
@@ -504,6 +501,7 @@ class CustomEntityRecord extends Import
     public function dropTable(): void
     {
         $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
+        $this->entitiesHelper->dropTable(self::TMP_TABLE_ATTRIBUTE_VALUES);
     }
 
     /**
