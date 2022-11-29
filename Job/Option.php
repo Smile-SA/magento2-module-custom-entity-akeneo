@@ -39,6 +39,22 @@ class Option extends Import
     protected string $name = 'Smile Custom Entity Attribute Option';
 
     /**
+     * Attribute types that have options.
+     */
+    protected array $attributeTypesWithOption = [
+        'single_option',
+        'multiple_options'
+    ];
+
+    /**
+     * Reference entity attribute types.
+     */
+    protected array $referenceEntityAttributes = [
+        'reference_entity_single_link',
+        'reference_entity_multiple_links'
+    ];
+
+    /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -96,16 +112,28 @@ class Option extends Import
         foreach ($entities as $entityCode) {
             $attributeApiResult = $attributeApi->all((string) $entityCode);
             foreach ($attributeApiResult as $attribute) {
-                if ($attribute['type'] == 'single_option' || $attribute['type'] == 'multiple_options') {
-                    $optionsApiResult = $attributeOptionApi->all((string) $entityCode, (string) $attribute['code']);
-                    foreach ($optionsApiResult as $option) {
-                        $option['attribute'] = $entityCode . '_' . $attribute['code'];
-                        $this->entitiesHelper->insertDataFromApi(
-                            $option,
-                            $this->jobExecutor->getCurrentJob()->getCode()
-                        );
-                        $optionsCount++;
-                    }
+                $attributeOptions = [];
+
+                // Process options for select, multiselect attributes.
+                if (in_array($attribute['type'], $this->attributeTypesWithOption)) {
+                    $attributeOptions = $attributeOptionApi->all((string) $entityCode, (string) $attribute['code']);
+                }
+
+                // Process options for reference entity attributes.
+                if (in_array($attribute['type'], $this->referenceEntityAttributes)) {
+                    $attributeOptions = $this->processReferenceEntitiesOption(
+                        (string) $attribute['reference_entity_code'],
+                        (string) $attribute['code']
+                    );
+                }
+
+                foreach ($attributeOptions as $option) {
+                    $option['attribute'] = $entityCode . '_' . $attribute['code'];
+                    $this->entitiesHelper->insertDataFromApi(
+                        $option,
+                        $this->jobExecutor->getCurrentJob()->getCode()
+                    );
+                    $optionsCount++;
                 }
             }
         }
@@ -390,5 +418,34 @@ class Option extends Import
                 'ALTER TABLE `' . $entityTable . '` AUTO_INCREMENT = ' . (max((int) $maxCode, (int) $maxEntity) + 1)
             );
         }
+    }
+
+    /**
+     * Load and transform entities' records to options.
+     */
+    protected function processReferenceEntitiesOption(string $referenceCode, string $attributeCode): array
+    {
+        $options = [];
+        $records = $this->akeneoClient->getReferenceEntityRecordApi()->all($referenceCode);
+        foreach ($records as $record) {
+            if (!isset($record['values']['label'])) {
+                $message = __('No label found for reference entity record %1.', $record['code']);
+                $this->jobExecutor->setAdditionalMessage($message);
+                continue;
+            }
+
+            $option = [];
+            $option['code'] = $record['code'];
+            $option['attribute'] = $attributeCode;
+            $labels = $record['values']['label'] ?? [];
+
+            foreach ($labels as $label) {
+                $option['labels'][$label['locale']] = $label['data'];
+            }
+
+            $options[] = $option;
+        }
+
+        return $options;
     }
 }
