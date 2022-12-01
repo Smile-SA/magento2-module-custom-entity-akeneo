@@ -58,7 +58,7 @@ class CustomEntityRecord extends Import
     protected array $defaultAttributes = [
         'label' => 'name',
         'image' => 'image',
-        'description' => 'description'
+        'description' => 'description',
     ];
 
     /**

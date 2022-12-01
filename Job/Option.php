@@ -43,7 +43,7 @@ class Option extends Import
      */
     protected array $attributeTypesWithOption = [
         'single_option',
-        'multiple_options'
+        'multiple_options',
     ];
 
     /**
@@ -51,7 +51,7 @@ class Option extends Import
      */
     protected array $referenceEntityAttributes = [
         'reference_entity_single_link',
-        'reference_entity_multiple_links'
+        'reference_entity_multiple_links',
     ];
 
     /**

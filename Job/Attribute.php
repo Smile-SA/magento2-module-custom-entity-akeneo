@@ -54,7 +54,7 @@ class Attribute extends Import
         'code',
         'label',
         'image',
-        'description'
+        'description',
     ];
 
     /**
