@@ -92,7 +92,7 @@ class CreateJobs implements DataPatchInterface
             ],
             'smile_custom_entity_record' => [
                 'class' => CustomEntityRecord::class,
-                'name' => 'Smile custom entity',
+                'name' => 'Smile custom entity record',
             ],
         ];
     }

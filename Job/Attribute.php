@@ -45,7 +45,7 @@ class Attribute extends Import
     /**
      * Import name.
      */
-    protected string $name = 'Smile Custom Entity Attribute';
+    protected string $name = 'Smile custom entity attribute';
 
     /**
      * @var string[]
@@ -54,6 +54,7 @@ class Attribute extends Import
         'code',
         'label',
         'image',
+        'description'
     ];
 
     /**

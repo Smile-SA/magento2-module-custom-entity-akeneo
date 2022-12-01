@@ -36,7 +36,7 @@ class Option extends Import
     /**
      * Import name.
      */
-    protected string $name = 'Smile Custom Entity Attribute Option';
+    protected string $name = 'Smile custom entity attribute option';
 
     /**
      * Attribute types that have options.

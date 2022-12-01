@@ -50,7 +50,7 @@ class CustomEntityRecord extends Import
     /**
      * Import name.
      */
-    protected string $name = 'Smile Custom Entity Record';
+    protected string $name = 'Smile custom entity record';
 
     /**
      * @var string[]
@@ -58,6 +58,7 @@ class CustomEntityRecord extends Import
     protected array $defaultAttributes = [
         'label' => 'name',
         'image' => 'image',
+        'description' => 'description'
     ];
 
     /**

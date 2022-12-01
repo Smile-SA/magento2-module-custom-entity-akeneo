@@ -39,7 +39,7 @@ class CustomEntity extends Import
     /**
      * Import name.
      */
-    protected string $name = 'Smile Custom Entity';
+    protected string $name = 'Smile custom entity';
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
