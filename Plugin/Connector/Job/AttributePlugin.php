@@ -36,8 +36,7 @@ class AttributePlugin
             $tmpTable = $this->entitiesHelper->getTableName('attribute');
             $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
             $select = $connection->select()->from($tmpTable)
-                ->where("frontend_input = 'smile_custom_entity'")
-                ->where('_is_new = 1');
+                ->where("frontend_input = 'smile_custom_entity'");
             $attributes = $connection->fetchAll($select);
             $productEntityTypeId = $this->eavSetup->getEntityTypeId(ProductAttributeInterface::ENTITY_TYPE_CODE);
             foreach ($attributes as $attribute) {
