@@ -52,10 +52,11 @@ class ProductPlugin
                     foreach ($products as $id => $productData) {
                         $valueIds = [];
                         if ($productData[$column] && is_string($productData[$column])) {
-                            $values = explode(",", $productData[$column]);
-                            foreach ($values as $key => $value) {
-                                $values[$key] = $column . '-' . $value;
-                            }
+                            $values = preg_filter(
+                                '/^/',
+                                "$column-",
+                                explode(",", $productData[$column])
+                            );
                             $valueIdSelect = $connection->select()
                                 ->from($entityTable, ['entity_id'])
                                 ->where('code IN (?)', $values)
