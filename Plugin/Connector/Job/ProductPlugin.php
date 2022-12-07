@@ -34,7 +34,17 @@ class ProductPlugin
 
             $selectAttributes = $connection->select()
                 ->from(['eav' => $eavAttributeTable], ['attribute_code', 'attribute_id'])
-                ->where('eav.frontend_input = "smile_custom_entity"');
+                ->joinLeft(
+                    ['cea' => $this->entitiesHelper->getTable('catalog_eav_attribute')],
+                    'eav.attribute_id = cea.attribute_id',
+                    []
+                )->joinLeft(
+                    ['ace' => $entityTable],
+                    'cea.custom_entity_attribute_set_id = ace.entity_id',
+                    ['code']
+                )->where(
+                    'ace.import = "smile_custom_entity"'
+                )->where('eav.frontend_input = "smile_custom_entity"');
 
             $customEntityAttributes = $connection->fetchAssoc($selectAttributes);
 
@@ -49,12 +59,13 @@ class ProductPlugin
                 try {
                     $select = $connection->select()->from($productTmpTable, ['_entity_id', $column]);
                     $products = $connection->fetchAssoc($select);
+                    $customEntityCode = $customEntityAttributes[$column]['code'];
                     foreach ($products as $id => $productData) {
                         $valueIds = [];
                         if ($productData[$column] && is_string($productData[$column])) {
                             $values = preg_filter(
                                 '/^/',
-                                "$column-",
+                                "$customEntityCode-",
                                 explode(",", $productData[$column])
                             );
                             $valueIdSelect = $connection->select()
