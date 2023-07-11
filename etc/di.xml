@@ -69,10 +69,14 @@
                         <item name="comment" xsi:type="string">Add or update attributes</item>
                     </item>
                     <item name="7" xsi:type="array">
+                        <item name="method" xsi:type="string">updateReferenceEntityAttribute</item>
+                        <item name="comment" xsi:type="string">Add reference entity id to attribute</item>
+                    </item>
+                    <item name="8" xsi:type="array">
                         <item name="method" xsi:type="string">dropTable</item>
                         <item name="comment" xsi:type="string">Drop temporary table</item>
                     </item>
-                    <item name="8" xsi:type="array">
+                    <item name="9" xsi:type="array">
                         <item name="method" xsi:type="string">cleanCache</item>
                         <item name="comment" xsi:type="string">Clean cache</item>
                     </item>
@@ -150,26 +154,30 @@
                         <item name="comment" xsi:type="string">Update column values for multiselect attributes</item>
                     </item>
                     <item name="9" xsi:type="array">
+                        <item name="method" xsi:type="string">updateReferenceEntityValues</item>
+                        <item name="comment" xsi:type="string">Update column values for reference entity select attributes</item>
+                    </item>
+                    <item name="10" xsi:type="array">
                         <item name="method" xsi:type="string">setValues</item>
                         <item name="comment" xsi:type="string">Set values to attributes</item>
                     </item>
-                    <item name="10" xsi:type="array">
+                    <item name="11" xsi:type="array">
                         <item name="method" xsi:type="string">setUrlKey</item>
                         <item name="comment" xsi:type="string">Set Url</item>
                     </item>
-                    <item name="11" xsi:type="array">
+                    <item name="12" xsi:type="array">
                         <item name="method" xsi:type="string">setIsActiveValues</item>
                         <item name="comment" xsi:type="string">Set active status for new entities</item>
                     </item>
-                    <item name="12" xsi:type="array">
+                    <item name="13" xsi:type="array">
                         <item name="method" xsi:type="string">importMedia</item>
                         <item name="comment" xsi:type="string">Import image attributes</item>
                     </item>
-                    <item name="13" xsi:type="array">
+                    <item name="14" xsi:type="array">
                         <item name="method" xsi:type="string">dropTable</item>
                         <item name="comment" xsi:type="string">Drop temporary table</item>
                     </item>
-                    <item name="14" xsi:type="array">
+                    <item name="15" xsi:type="array">
                         <item name="method" xsi:type="string">cleanCache</item>
                         <item name="comment" xsi:type="string">Clean cache</item>
                     </item>

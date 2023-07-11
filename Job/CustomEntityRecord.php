@@ -351,6 +351,74 @@ class CustomEntityRecord extends Import
     }
 
     /**
+     * Update column values for reference entity attributes.
+     */
+    public function updateReferenceEntityValues(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $tmpTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
+        $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
+        $attributeTable = $this->entitiesHelper->getTable('eav_attribute');
+        $entityTypeTable = $this->entitiesHelper->getTable('eav_entity_type');
+
+        $select = $connection->select()
+            ->from(
+                ['tmp' => $tmpTable],
+                ['record', 'attribute', 'data']
+            )->joinLeft(
+                ['ea' => $attributeTable],
+                'tmp.attribute = ea.attribute_code',
+                []
+            )->joinLeft(
+                ['eet' => $entityTypeTable],
+                'ea.entity_type_id = eet.entity_type_id',
+                []
+            )->joinLeft(
+                ['ace' => $entityTable],
+                'ace.entity_id = ea.custom_entity_attribute_set_id',
+                ['entity_code' => 'code']
+            )->where(
+                'eet.entity_type_code = ?',
+                CustomEntityInterface::ENTITY
+            )->where(
+                'ea.custom_entity_attribute_set_id IS NOT NULL'
+            );
+
+        $attributes = $connection->fetchAll($select);
+        $loadedOptions = [];
+        foreach ($attributes as &$attribute) {
+            if (!$attribute['data']) {
+                continue;
+            }
+            $attributeValues = explode(',', $attribute['data']);
+            $data = [];
+            foreach ($attributeValues as $attributeValue) {
+                $code = $attribute['entity_code'] . '-' . $attributeValue;
+                if (!key_exists($code, $loadedOptions)) {
+                    $optionIdSelect = $connection->select()
+                        ->from(['e' => $entityTable], ['entity_id'])
+                        ->where('e.code = ?', $code)
+                        ->where('e.import = "smile_custom_entity_record"');
+                    $loadedOptions[$code] = $connection->fetchOne($optionIdSelect);
+                }
+                $data[] = $loadedOptions[$code];
+            }
+            $attribute['data'] = implode(',', $data);
+
+            $connection->update(
+                $tmpTable,
+                [
+                    'data' => $attribute['data'],
+                ],
+                [
+                    'record = ?' => $attribute['record'],
+                    'attribute = ?' => $attribute['attribute'],
+                ]
+            );
+        }
+    }
+
+    /**
      * Insert entity attribute values.
      *
      * @throws LocalizedException
@@ -483,7 +551,6 @@ class CustomEntityRecord extends Import
         $images = $connection->fetchAll($select);
         if (empty($images)) {
             $this->jobExecutor->setMessage(__('No images to import'));
-            $this->jobExecutor->afterRun(true);
             return;
         }
         $api = $this->akeneoClient->getReferenceEntityMediaFileApi();

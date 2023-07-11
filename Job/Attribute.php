@@ -212,7 +212,9 @@ class Attribute extends Import
     public function matchType(): void
     {
         $connection = $this->entitiesHelper->getConnection();
-        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        $tmpTable = $this->entitiesHelper->getTableName(
+            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+        );
         $columns = $this->attributeHelper->getSpecificColumns();
 
         foreach ($columns as $name => $def) {
@@ -440,6 +442,43 @@ class Attribute extends Import
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Update attribute set value for reference entity attribute type.
+     */
+    public function updateReferenceEntityAttribute(): void
+    {
+        $connection = $this->entitiesHelper->getConnection();
+        $tmpTable = $this->entitiesHelper->getTableName(
+            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+        );
+        $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
+        $entityTypeId = $this->eavSetup->getEntityTypeId(CustomEntityInterface::ENTITY);
+
+        $select = $connection->select()->from($tmpTable)
+            ->where("type IN ('reference_entity_single_link','reference_entity_multiple_links')");
+        $attributes = $connection->fetchAll($select);
+        foreach ($attributes as $attribute) {
+            if ($attribute['reference_entity_code']) {
+                $entitySelect = $connection->select()->from($entityTable, ['entity_id'])
+                    ->where('code = ?', $attribute['reference_entity_code'])
+                    ->where('import = "smile_custom_entity"');
+                $customEntityTypeId = $connection->fetchOne($entitySelect);
+                if (!$customEntityTypeId) {
+                    continue;
+                }
+                $values = [
+                    'custom_entity_attribute_set_id' => $customEntityTypeId,
+                    'is_user_defined' => 0,
+                ];
+                $this->eavSetup->updateAttribute(
+                    $entityTypeId,
+                    $attribute['_entity_id'],
+                    $values
+                );
             }
         }
     }

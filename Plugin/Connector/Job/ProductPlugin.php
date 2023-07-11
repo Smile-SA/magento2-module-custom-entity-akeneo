@@ -36,12 +36,8 @@ class ProductPlugin
             $selectAttributes = $connection->select()
                 ->from(['eav' => $eavAttributeTable], ['attribute_code', 'attribute_id'])
                 ->joinLeft(
-                    ['cea' => $this->entitiesHelper->getTable('catalog_eav_attribute')],
-                    'eav.attribute_id = cea.attribute_id',
-                    []
-                )->joinLeft(
                     ['ace' => $entityTable],
-                    'cea.custom_entity_attribute_set_id = ace.entity_id',
+                    'eav.custom_entity_attribute_set_id = ace.entity_id',
                     ['code']
                 )->where(
                     'ace.import = "smile_custom_entity"'

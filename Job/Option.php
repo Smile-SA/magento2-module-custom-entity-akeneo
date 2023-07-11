@@ -99,6 +99,9 @@ class Option extends Import
         $entities = $this->referenceEntityHelper->getEntitiesToImport();
 
         if (empty($entities)) {
+            $this->entitiesHelper->dropTable(
+                $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+            );
             $this->jobExecutor->setMessage(__('No entities found'));
             $this->jobExecutor->afterRun(true);
             return;
@@ -106,7 +109,7 @@ class Option extends Import
 
         $this->entitiesHelper->createTmpTable(
             ['code', $adminLabelColumn],
-            $this->jobExecutor->getCurrentJob()->getCode()
+            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
         );
 
         foreach ($entities as $entityCode) {
@@ -119,19 +122,11 @@ class Option extends Import
                     $attributeOptions = $attributeOptionApi->all((string) $entityCode, (string) $attribute['code']);
                 }
 
-                // Process options for reference entity attributes.
-                if (in_array($attribute['type'], $this->referenceEntityAttributes)) {
-                    $attributeOptions = $this->processReferenceEntitiesOption(
-                        (string) $attribute['reference_entity_code'],
-                        (string) $attribute['code']
-                    );
-                }
-
                 foreach ($attributeOptions as $option) {
                     $option['attribute'] = $entityCode . '_' . $attribute['code'];
                     $this->entitiesHelper->insertDataFromApi(
                         $option,
-                        $this->jobExecutor->getCurrentJob()->getCode()
+                        $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
                     );
                     $optionsCount++;
                 }
@@ -141,7 +136,15 @@ class Option extends Import
             __('%1 option(s) found', $optionsCount)
         );
 
-        $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
+        if (!$optionsCount) {
+            $this->jobExecutor->setMessage(__('No options found'));
+            $this->jobExecutor->afterRun(null);
+            return;
+        }
+
+        $tmpTable = $this->entitiesHelper->getTableName(
+            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+        );
         $select = $connection->select()->from(
             $tmpTable,
             [
@@ -418,34 +421,5 @@ class Option extends Import
                 'ALTER TABLE `' . $entityTable . '` AUTO_INCREMENT = ' . (max((int) $maxCode, (int) $maxEntity) + 1)
             );
         }
-    }
-
-    /**
-     * Load and transform entities' records to options.
-     */
-    protected function processReferenceEntitiesOption(string $referenceCode, string $attributeCode): array
-    {
-        $options = [];
-        $records = $this->akeneoClient->getReferenceEntityRecordApi()->all($referenceCode);
-        foreach ($records as $record) {
-            if (!isset($record['values']['label'])) {
-                $message = __('No label found for reference entity record %1.', $record['code']);
-                $this->jobExecutor->setAdditionalMessage($message);
-                continue;
-            }
-
-            $option = [];
-            $option['code'] = $record['code'];
-            $option['attribute'] = $attributeCode;
-            $labels = $record['values']['label'] ?? [];
-
-            foreach ($labels as $label) {
-                $option['labels'][$label['locale']] = $label['data'];
-            }
-
-            $options[] = $option;
-        }
-
-        return $options;
     }
 }
