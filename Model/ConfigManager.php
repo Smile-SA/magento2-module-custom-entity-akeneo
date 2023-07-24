@@ -12,7 +12,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 class ConfigManager
 {
     /**
-     * #@+
      * Config patch.
      */
     public const FILTER_MODE = 'akeneo_connector/smile_custom_entity/mode';
@@ -21,7 +20,6 @@ class ConfigManager
     public const CACHE_TYPE_CUSTOM_ENTITY = 'akeneo_connector/cache/smile_custom_entity';
     public const CACHE_TYPE_CUSTOM_ENTITY_ATTRIBUTE = 'akeneo_connector/cache/smile_custom_entity_attribute';
     public const CACHE_TYPE_CUSTOM_ENTITY_RECORD = 'akeneo_connector/cache/smile_custom_entity_record';
-    /**#@-*/
 
     public function __construct(protected ScopeConfigInterface $scopeConfig)
     {

@@ -12,12 +12,10 @@ use Magento\Framework\Data\OptionSourceInterface;
 class Mode implements OptionSourceInterface
 {
     /**
-     * #@+
      * Mode type code.
      */
     public const ALL = 'all';
     public const SPECIFIC = 'specific';
-    /**#@-*/
 
     /**
      * @inheritdoc

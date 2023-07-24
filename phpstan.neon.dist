@@ -8,7 +8,6 @@ parameters:
         - 'vendor/*'
     ignoreErrors:
         - '#Call to an undefined method Akeneo\\Connector\\Api\\Data\\JobInterface::getCode\(\).#'
-        - '#Parameter \#1 \$tableSuffix of method Akeneo\\Connector\\Helper\\Import\\Entities::getTableName\(\) expects null, string given.#'
 
 includes:
     - %currentWorkingDirectory%/vendor/smile/magento2-smilelab-phpstan/extension.neon

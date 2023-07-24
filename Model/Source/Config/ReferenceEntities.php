@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Smile\CustomEntityAkeneo\Model\Source\Config;
 
 use Akeneo\Connector\Helper\Authenticator;
+use Exception;
 use Magento\Framework\Data\OptionSourceInterface;
 use Psr\Log\LoggerInterface as Logger;
 
@@ -59,7 +60,7 @@ class ReferenceEntities implements OptionSourceInterface
                 }
                 $entities[$referenceEntity['code']] = $referenceEntity['code'];
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->logger->warning($exception->getMessage());
         }
 

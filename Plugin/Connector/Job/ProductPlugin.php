@@ -7,6 +7,7 @@ namespace Smile\CustomEntityAkeneo\Plugin\Connector\Job;
 use Akeneo\Connector\Helper\Config;
 use Akeneo\Connector\Helper\Import\Entities;
 use Akeneo\Connector\Job\Product;
+use Exception;
 use Smile\CustomEntityProductLink\Model\ResourceModel\CustomEntityProductLinkManagement;
 
 /**
@@ -80,7 +81,7 @@ class ProductPlugin
                             $valueIds
                         );
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $productJob->getLogger()->error($e->getMessage());
                 }
             }

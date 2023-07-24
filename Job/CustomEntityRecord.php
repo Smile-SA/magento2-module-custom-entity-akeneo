@@ -35,12 +35,10 @@ use Zend_Db_Statement_Exception;
 class CustomEntityRecord extends Import
 {
     /**
-     * #@+
      * Table names.
      */
     public const ENTITY_TABLE = 'smile_custom_entity';
     public const TMP_TABLE_ATTRIBUTE_VALUES = 'custom_entity_record_attribute';
-    /**#@-*/
 
     /**
      * Import code.
