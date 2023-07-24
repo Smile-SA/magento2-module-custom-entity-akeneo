@@ -110,7 +110,7 @@ class CustomEntityRecord extends Import
             $this->jobExecutor->getCurrentJob()->getCode()
         );
         $this->entitiesHelper->createTmpTable(
-            ['record', 'attribute', 'locale', 'data'],
+            ['entity', 'record', 'attribute', 'locale', 'data'],
             self::TMP_TABLE_ATTRIBUTE_VALUES
         );
 
@@ -132,6 +132,7 @@ class CustomEntityRecord extends Import
                     foreach ($attributeValues as $attributeValue) {
                         $this->entitiesHelper->insertDataFromApi(
                             [
+                                'entity' => $entity,
                                 'record' => $record['code'],
                                 'attribute' => $attribute,
                                 'locale' => $attributeValue['locale'],
@@ -366,7 +367,7 @@ class CustomEntityRecord extends Import
         // Insert global attributes
         $select = $connection->select()
             ->from(['a' => $tmpAttributeTable], ['attribute', 'data'])
-            ->joinLeft(['r' => $tmpTable], 'a.record = r.code', ['_entity_id']);
+            ->joinLeft(['r' => $tmpTable], 'a.record = r.code AND a.entity = r.entity', ['_entity_id']);
         $globalAttributes = $connection->fetchAll($select->where('locale IS NULL'));
         $this->setAttributesValue($globalAttributes, 0, $entityTypeId);
 
