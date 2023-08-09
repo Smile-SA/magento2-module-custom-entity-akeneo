@@ -382,6 +382,9 @@ class CustomEntityRecord extends Import
                 CustomEntityInterface::ENTITY
             )->where(
                 'ea.custom_entity_attribute_set_id IS NOT NULL'
+            )->where(
+                'ace.import = ?',
+                'smile_custom_entity'
             );
 
         $attributes = $connection->fetchAll($select);
