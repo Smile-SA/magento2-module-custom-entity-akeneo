@@ -22,6 +22,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Smile\CustomEntity\Api\Data\CustomEntityInterface;
 use Smile\CustomEntityAkeneo\Helper\Import\ReferenceEntity;
 use Smile\CustomEntityAkeneo\Model\ConfigManager;
+use Smile\ScopedEav\Model\Entity\Attribute\Backend\Image;
 use Zend_Db_Expr as Expr;
 use Zend_Db_Statement_Exception;
 
@@ -233,6 +234,15 @@ class Attribute extends Import
 
         foreach ($data as $id => $attribute) {
             $type = $this->attributeHelper->getType($attribute['type']);
+            if($attribute['type'] == 'image') {
+                $type = [
+                    'backend_type' => 'varchar',
+                    'frontend_input' => 'image',
+                    'backend_model' =>  Image::class,
+                    'source_model' => null,
+                    'frontend_model' => null
+                ];
+            }
             $connection->update($tmpTable, $type, ['_entity_id = ?' => $id]);
         }
     }

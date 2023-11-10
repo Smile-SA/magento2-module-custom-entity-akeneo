@@ -108,7 +108,7 @@ class CustomEntityRecord extends Import
             $this->jobExecutor->getCurrentJob()->getCode()
         );
         $this->entitiesHelper->createTmpTable(
-            ['entity', 'record', 'attribute', 'locale', 'data'],
+            ['entity', 'record', 'attribute', 'locale', 'channel', 'data'],
             self::TMP_TABLE_ATTRIBUTE_VALUES
         );
 
@@ -134,8 +134,8 @@ class CustomEntityRecord extends Import
                                 'record' => $record['code'],
                                 'attribute' => $attribute,
                                 'locale' => $attributeValue['locale'],
+                                'channel' => $attributeValue['channel'],
                                 'data' => $attributeValue['data'],
-
                             ],
                             self::TMP_TABLE_ATTRIBUTE_VALUES
                         );
@@ -282,7 +282,7 @@ class CustomEntityRecord extends Import
         $entityTypeTable = $this->entitiesHelper->getTable('eav_entity_type');
 
         $select = $connection->select()
-            ->from(['tmp' => $tmpTable], ['record', 'attribute', 'locale'])
+            ->from(['tmp' => $tmpTable], ['record', 'attribute', 'locale', 'channel'])
             ->joinLeft(['ace' => $entityTable], 'ace.code = CONCAT(tmp.attribute,"-",tmp.data)', ['entity_id'])
             ->joinLeft(['ea' => $attributeTable], 'tmp.attribute = ea.attribute_code', ['frontend_input'])
             ->joinLeft(['eet' => $entityTypeTable], 'ea.entity_type_id = eet.entity_type_id', [])
@@ -301,6 +301,7 @@ class CustomEntityRecord extends Import
                 [
                     'record = ?' => $option['record'],
                     'attribute = ?' => $option['attribute'],
+                    'channel = ?' => $option['channel'],
                     $option['locale'] ? 'locale = "' . $option['locale'] . '"' : 'locale IS NULL',
                 ]
             );
@@ -319,7 +320,7 @@ class CustomEntityRecord extends Import
         $entityTypeTable = $this->entitiesHelper->getTable('eav_entity_type');
 
         $select = $connection->select()
-            ->from(['tmp' => $tmpTable], ['record', 'attribute', 'data'])
+            ->from(['tmp' => $tmpTable], ['record', 'attribute', 'data', 'channel'])
             ->joinLeft(['ea' => $attributeTable], 'tmp.attribute = ea.attribute_code', [])
             ->joinLeft(['eet' => $entityTypeTable], 'ea.entity_type_id = eet.entity_type_id', [])
             ->where('eet.entity_type_code = ?', CustomEntityInterface::ENTITY)
@@ -345,6 +346,7 @@ class CustomEntityRecord extends Import
                 [
                     'record = ?' => $attribute['record'],
                     'attribute = ?' => $attribute['attribute'],
+                    'channel = ?' => $attribute['channel'],
                 ]
             );
         }
@@ -437,16 +439,57 @@ class CustomEntityRecord extends Import
         $select = $connection->select()
             ->from(['a' => $tmpAttributeTable], ['attribute', 'data'])
             ->joinLeft(['r' => $tmpTable], 'a.record = r.code AND a.entity = r.entity', ['_entity_id']);
-        $globalAttributes = $connection->fetchAll($select->where('locale IS NULL'));
+        $globalAttributes = $connection->fetchAll($select->where('locale IS NULL')->where('channel IS NULL'));
+
         $this->setAttributesValue($globalAttributes, 0, $entityTypeId);
 
+        $channelLang = [];
+        // Insert values for each channel
+        foreach ($this->storeHelper->getStores('channel_code') as $channel => $stores) {
+            $attributes = $connection->fetchAll(
+                $select->reset('where')
+                    ->where('locale IS NULL')
+                    ->where('channel = ?', $channel)
+            );
+            if (!empty($attributes)) {
+                foreach ($stores as $store) {
+                    if ($store['store_id'] != 0) {
+                        $this->setAttributesValue($attributes, (int)$store['store_id'], $entityTypeId);
+                    }
+                }
+            }
+
+            foreach ($stores as $store) {
+                if ($store['store_id'] != 0) {
+                    $channelLang[$channel . $store['lang']][$store['store_id']] = $store['store_id'];
+                }
+            }
+        }
+
         // Insert values for each locale
-        $locales = $this->storeHelper->getStores('lang');
-        foreach ($locales as $lang => $stores) {
-            $localeAttributes = $connection->fetchAll($select->reset('where')->where('locale = ?', $lang));
+        foreach ($this->storeHelper->getStores('lang') as $lang => $stores) {
+            $localeAttributes = $connection->fetchAll(
+                $select->reset('where')
+                    ->where('locale = ?', $lang)
+                    ->where('channel IS NULL')
+            );
             if (!empty($localeAttributes)) {
                 foreach ($stores as $store) {
                     $this->setAttributesValue($localeAttributes, (int) $store['store_id'], $entityTypeId);
+                }
+            }
+        }
+
+        // Insert values for each channel and locale
+        foreach ($channelLang as $code => $stores) {
+            $attributes = $connection->fetchAll(
+                $select->reset('where')
+                    ->where('locale = ?', substr($code, -5))
+                    ->where('channel = ?', substr($code, 0, -5))
+            );
+            if (!empty($attributes)) {
+                foreach ($stores as $store) {
+                    $this->setAttributesValue($attributes, (int)$store, $entityTypeId);
                 }
             }
         }
@@ -550,7 +593,8 @@ class CustomEntityRecord extends Import
         $tmpAttributeTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $select = $connection->select()
             ->from(['a' => $tmpAttributeTable], ['attribute', 'data'])
-            ->where('a.attribute = "image"');
+            ->join(['ea' => 'eav_attribute'],  'ea.attribute_code = a.attribute', '')
+            ->where('ea.frontend_input = "image"');
         $images = $connection->fetchAll($select);
         if (empty($images)) {
             $this->jobExecutor->setMessage(__('No images to import'));
@@ -570,8 +614,10 @@ class CustomEntityRecord extends Import
      */
     public function dropTable(): void
     {
-        $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
-        $this->entitiesHelper->dropTable(self::TMP_TABLE_ATTRIBUTE_VALUES);
+        if (!$this->configHelper->isAdvancedLogActivated()) {
+            $this->entitiesHelper->dropTable($this->jobExecutor->getCurrentJob()->getCode());
+            $this->entitiesHelper->dropTable(self::TMP_TABLE_ATTRIBUTE_VALUES);
+        }
     }
 
     /**
