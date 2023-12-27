@@ -22,6 +22,9 @@ class ProductPlugin
     ) {
     }
 
+    /**
+     * Plugin on afterUpdateOption method to manage refecerence entities.
+     */
     public function afterUpdateOption(Product $productJob): void
     {
         if (!$this->configHelper->isReferenceEntitiesEnabled()) {
@@ -57,7 +60,10 @@ class ProductPlugin
                     $subSelect = $connection->select()
                         ->from(
                             ['c' => $entityTable],
-                            ['code' => sprintf('SUBSTRING(`c`.`code`, %s)', $prefixLength), 'entity_id' => 'c.entity_id']
+                            [
+                                'code' => sprintf('SUBSTRING(`c`.`code`, %s)', $prefixLength), 
+                                'entity_id' => 'c.entity_id'
+                            ]
                         )
                         ->where(sprintf('c.code LIKE "%s%s"', $customEntityAttributes[$column]['code'], '%'))
                         ->where('c.import = ?', 'smile_custom_entity_record');
@@ -68,15 +74,15 @@ class ProductPlugin
                     }
 
                     //in case of multiselect
-                    $conditionJoin = "IF ( locate(',', `" . $column . "`) > 0 , " . new Expr(
-                            "FIND_IN_SET(`c1`.`code`,`p`.`" . $column . "`) > 0"
-                        ) . ", `p`.`" . $column . "` = `c1`.`code` )";
+                    $conditionJoin = "IF ( locate(',', `" . $column . "`) > 0 , " 
+                        . new Expr("FIND_IN_SET(`c1`.`code`,`p`.`" . $column . "`) > 0") 
+                        . ", `p`.`" . $column . "` = `c1`.`code` )";
 
                     $select = $connection->select()->from(
                         ['p' => $productTmpTable],
                         ['identifier' => 'p.identifier', 'entity_id' => 'p._entity_id']
                     )->joinInner(
-                        ['c1' => new Expr('(' . (string)$subSelect . ')')],
+                        ['c1' => new Expr('(' . (string) $subSelect . ')')],
                         new Expr($conditionJoin),
                         [$column => new Expr('GROUP_CONCAT(`c1`.`entity_id` SEPARATOR ",")')]
                     )->group('p.identifier');
