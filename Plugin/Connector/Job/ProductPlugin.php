@@ -61,8 +61,8 @@ class ProductPlugin
                         ->from(
                             ['c' => $entityTable],
                             [
-                                'code' => sprintf('SUBSTRING(`c`.`code`, %s)', $prefixLength), 
-                                'entity_id' => 'c.entity_id'
+                                'code' => sprintf('SUBSTRING(`c`.`code`, %s)', $prefixLength),
+                                'entity_id' => 'c.entity_id',
                             ]
                         )
                         ->where(sprintf('c.code LIKE "%s%s"', $customEntityAttributes[$column]['code'], '%'))
@@ -74,8 +74,8 @@ class ProductPlugin
                     }
 
                     //in case of multiselect
-                    $conditionJoin = "IF ( locate(',', `" . $column . "`) > 0 , " 
-                        . new Expr("FIND_IN_SET(`c1`.`code`,`p`.`" . $column . "`) > 0") 
+                    $conditionJoin = "IF ( locate(',', `" . $column . "`) > 0 , "
+                        . new Expr("FIND_IN_SET(`c1`.`code`,`p`.`" . $column . "`) > 0")
                         . ", `p`.`" . $column . "` = `c1`.`code` )";
 
                     $select = $connection->select()->from(

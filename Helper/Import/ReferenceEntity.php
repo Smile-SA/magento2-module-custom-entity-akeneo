@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Helper\Import;
 
+use Akeneo\Connector\Executor\JobExecutor;
 use Akeneo\Connector\Helper\Authenticator;
 use Akeneo\Connector\Helper\Config as ConfigHelper;
 use Akeneo\Connector\Helper\Import\Entities;
@@ -28,6 +29,7 @@ class ReferenceEntity extends Entities
         ConfigHelper $configHelper,
         LoggerInterface $logger,
         Authenticator $authenticator,
+        JobExecutor $jobExecutor,
         protected ConfigManager $configManager
     ) {
         parent::__construct(
@@ -36,7 +38,8 @@ class ReferenceEntity extends Entities
             $product,
             $configHelper,
             $logger,
-            $authenticator
+            $authenticator,
+            $jobExecutor
         );
     }
 

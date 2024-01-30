@@ -6,8 +6,6 @@ parameters:
         - .
     excludePaths:
         - 'vendor/*'
-    ignoreErrors:
-        - '#Call to an undefined method Akeneo\\Connector\\Api\\Data\\JobInterface::getCode\(\).#'
 
 includes:
     - %currentWorkingDirectory%/vendor/smile/magento2-smilelab-phpstan/extension.neon

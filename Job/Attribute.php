@@ -214,7 +214,7 @@ class Attribute extends Import
     {
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName(
-            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+            $this->jobExecutor->getCurrentJob()->getCode()
         );
         $columns = $this->attributeHelper->getSpecificColumns();
 
@@ -234,13 +234,13 @@ class Attribute extends Import
 
         foreach ($data as $id => $attribute) {
             $type = $this->attributeHelper->getType($attribute['type']);
-            if($attribute['type'] == 'image') {
+            if ($attribute['type'] == 'image') {
                 $type = [
                     'backend_type' => 'varchar',
                     'frontend_input' => 'image',
                     'backend_model' =>  Image::class,
                     'source_model' => null,
-                    'frontend_model' => null
+                    'frontend_model' => null,
                 ];
             }
             $connection->update($tmpTable, $type, ['_entity_id = ?' => $id]);
@@ -463,7 +463,7 @@ class Attribute extends Import
     {
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName(
-            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+            $this->jobExecutor->getCurrentJob()->getCode()
         );
         $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
         $entityTypeId = $this->eavSetup->getEntityTypeId(CustomEntityInterface::ENTITY);
