@@ -31,6 +31,8 @@ use Zend_Db_Statement_Exception;
  * Custom entity record (reference record) import job.
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
  */
 class CustomEntityRecord extends Import
 {
@@ -454,7 +456,7 @@ class CustomEntityRecord extends Import
             if (!empty($attributes)) {
                 foreach ($stores as $store) {
                     if ($store['store_id'] != 0) {
-                        $this->setAttributesValue($attributes, (int)$store['store_id'], $entityTypeId);
+                        $this->setAttributesValue($attributes, (int) $store['store_id'], $entityTypeId);
                     }
                 }
             }
@@ -489,7 +491,7 @@ class CustomEntityRecord extends Import
             );
             if (!empty($attributes)) {
                 foreach ($stores as $store) {
-                    $this->setAttributesValue($attributes, (int)$store, $entityTypeId);
+                    $this->setAttributesValue($attributes, (int) $store, $entityTypeId);
                 }
             }
         }
@@ -593,7 +595,7 @@ class CustomEntityRecord extends Import
         $tmpAttributeTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
         $select = $connection->select()
             ->from(['a' => $tmpAttributeTable], ['attribute', 'data'])
-            ->join(['ea' => 'eav_attribute'],  'ea.attribute_code = a.attribute', '')
+            ->join(['ea' => 'eav_attribute'], 'ea.attribute_code = a.attribute', '')
             ->where('ea.frontend_input = "image"');
         $images = $connection->fetchAll($select);
         if (empty($images)) {

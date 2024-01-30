@@ -100,7 +100,7 @@ class Option extends Import
 
         if (empty($entities)) {
             $this->entitiesHelper->dropTable(
-                $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+                $this->jobExecutor->getCurrentJob()->getCode()
             );
             $this->jobExecutor->setMessage(__('No entities found'));
             $this->jobExecutor->afterRun(true);
@@ -109,7 +109,7 @@ class Option extends Import
 
         $this->entitiesHelper->createTmpTable(
             ['code', $adminLabelColumn],
-            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+            $this->jobExecutor->getCurrentJob()->getCode()
         );
 
         foreach ($entities as $entityCode) {
@@ -126,7 +126,7 @@ class Option extends Import
                     $option['attribute'] = $entityCode . '_' . $attribute['code'];
                     $this->entitiesHelper->insertDataFromApi(
                         $option,
-                        $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+                        $this->jobExecutor->getCurrentJob()->getCode()
                     );
                     $optionsCount++;
                 }
@@ -143,7 +143,7 @@ class Option extends Import
         }
 
         $tmpTable = $this->entitiesHelper->getTableName(
-            $this->jobExecutor->getCurrentJob()->getCode() // @phpstan-ignore-line
+            $this->jobExecutor->getCurrentJob()->getCode()
         );
         $select = $connection->select()->from(
             $tmpTable,
