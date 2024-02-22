@@ -507,7 +507,7 @@ class CustomEntityRecord extends Import
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
         $tmpAttributeTable = $this->entitiesHelper->getTableName(self::TMP_TABLE_ATTRIBUTE_VALUES);
-        $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
+        $entityTypeId = (int) $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
         $urlAttribute = $this->referenceEntityHelper->getAttribute(
             CustomEntityInterface::URL_KEY,
             $entityTypeId
@@ -553,7 +553,7 @@ class CustomEntityRecord extends Import
     {
         $connection = $this->entitiesHelper->getConnection();
         $tmpTable = $this->entitiesHelper->getTableName($this->jobExecutor->getCurrentJob()->getCode());
-        $entityTypeId = $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
+        $entityTypeId = (int) $this->configHelper->getEntityTypeId(CustomEntityInterface::ENTITY);
 
         $isActiveAttribute = $this->referenceEntityHelper->getAttribute(
             CustomEntityInterface::IS_ACTIVE,
@@ -660,7 +660,7 @@ class CustomEntityRecord extends Import
 
         foreach ($attributes as $row) {
             $attribute = $this->referenceEntityHelper->getAttribute(
-                $row['attribute'],
+                (string) $row['attribute'],
                 $entityTypeId
             );
 
