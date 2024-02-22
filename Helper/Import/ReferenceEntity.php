@@ -4,15 +4,8 @@ declare(strict_types=1);
 
 namespace Smile\CustomEntityAkeneo\Helper\Import;
 
-use Akeneo\Connector\Executor\JobExecutor;
-use Akeneo\Connector\Helper\Authenticator;
-use Akeneo\Connector\Helper\Config as ConfigHelper;
 use Akeneo\Connector\Helper\Import\Entities;
-use Magento\Catalog\Model\Product as BaseProductModel;
 use Magento\Eav\Api\Data\AttributeInterface;
-use Magento\Framework\App\DeploymentConfig;
-use Magento\Framework\App\ResourceConnection;
-use Psr\Log\LoggerInterface;
 use Smile\CustomEntityAkeneo\Model\ConfigManager;
 use Smile\CustomEntityAkeneo\Model\Source\Config\Mode;
 use Zend_Db_Statement_Exception;
@@ -20,27 +13,12 @@ use Zend_Db_Statement_Exception;
 /**
  * Reference Entity import helper.
  */
-class ReferenceEntity extends Entities
+class ReferenceEntity
 {
     public function __construct(
-        ResourceConnection $connection,
-        DeploymentConfig $deploymentConfig,
-        BaseProductModel $product,
-        ConfigHelper $configHelper,
-        LoggerInterface $logger,
-        Authenticator $authenticator,
-        JobExecutor $jobExecutor,
+        protected Entities $entitiesHelper,
         protected ConfigManager $configManager
     ) {
-        parent::__construct(
-            $connection,
-            $deploymentConfig,
-            $product,
-            $configHelper,
-            $logger,
-            $authenticator,
-            $jobExecutor
-        );
     }
 
     /**
@@ -50,8 +28,8 @@ class ReferenceEntity extends Entities
      */
     public function getEntitiesToImport(): array
     {
-        $connection = $this->getConnection();
-        $entityTable = $this->getTable('akeneo_connector_entities');
+        $connection = $this->entitiesHelper->getConnection();
+        $entityTable = $this->entitiesHelper->getTable('akeneo_connector_entities');
         $selectExistingEntities = $connection->select()
             ->from(['e' => $entityTable], 'e.code')
             ->where('e.import = ?', 'smile_custom_entity');
@@ -67,15 +45,15 @@ class ReferenceEntity extends Entities
     }
 
     /**
-     * @inheritdoc
+     * Retrieve attribute.
      */
-    public function getAttribute($code, $entityTypeId): bool|array
+    public function getAttribute(string $code, int $entityTypeId): bool|array
     {
-        $connection = $this->connection;
+        $connection = $this->entitiesHelper->getConnection();
 
         $attribute = $connection->fetchRow(
             $connection->select()->from(
-                $this->getTable('eav_attribute'),
+                $this->entitiesHelper->getTable('eav_attribute'),
                 [
                     AttributeInterface::ATTRIBUTE_ID,
                     AttributeInterface::BACKEND_TYPE,
@@ -90,6 +68,7 @@ class ReferenceEntity extends Entities
         if (empty($attribute)) {
             return false;
         }
+
         return $attribute;
     }
 }
