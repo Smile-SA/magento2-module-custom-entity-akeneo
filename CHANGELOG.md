@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.4 - 2024-03-05
+
+- Removed dependency from parent constructor in ReferenceEntity helper [#24](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/24)
+
 ## 1.0.3 - 2024-02-13
 
 - Adaptation of the import of custom entity attributes and custom entity records to manage all image attributes and value by channel and/or locale in [#19](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/19), [#20](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/20), [#21](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/21)
