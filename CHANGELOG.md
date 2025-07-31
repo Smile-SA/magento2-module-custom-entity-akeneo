@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.5 - 2025-07-30
+
+- Fix import of smile_custom_entity type attributes when frontend input type does not match between akeneo and magento [#25](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/25)
+
 ## 1.0.4 - 2024-03-05
 
 - Removed dependency from parent constructor in ReferenceEntity helper [#24](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/24)
