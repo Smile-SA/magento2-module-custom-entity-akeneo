@@ -11,12 +11,9 @@ jobs:
         runs-on: 'ubuntu-latest'
 
         strategy:
+            fail-fast: false
             matrix:
                 include:
-                    - php-version: '8.1'
-                      magento: '2.4.4.*'
-                    - php-version: '8.1'
-                      magento: '2.4.5.*'
                     - php-version: '8.2'
                       magento: '2.4.6.*'
                     - php-version: '8.3'
