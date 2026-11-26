@@ -14,7 +14,10 @@
 
     <config name="php_version" value="80100"/>
 
-    <rule ref="SmileLab"/>
+    <rule ref="SmileLab">
+        <!-- Union types are not used: the code generator of Magento 2.4.4 and 2.4.5 cannot handle them -->
+        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"/>
+    </rule>
 
     <file>.</file>
     <exclude-pattern>vendor/*</exclude-pattern>

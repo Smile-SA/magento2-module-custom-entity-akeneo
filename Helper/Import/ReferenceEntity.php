@@ -46,8 +46,10 @@ class ReferenceEntity
 
     /**
      * Retrieve attribute.
+     *
+     * @return bool|array
      */
-    public function getAttribute(string $code, int $entityTypeId): bool|array
+    public function getAttribute(string $code, int $entityTypeId)
     {
         $connection = $this->entitiesHelper->getConnection();
 
