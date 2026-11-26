@@ -4,6 +4,17 @@
 
 Import Akeneo's Reference Entities into Smile Custom Entity module.
 
+## Compatibility
+
+| Module version | Magento | Mage-OS | PHP |
+| --- | --- | --- | --- |
+| 1.1.x | 2.4.6 and later (tested up to 2.4.9) | 1.0.0 and later (tested up to 4.0) | 8.1 to 8.5, as supported by the platform |
+| 1.0.x, from 1.0.6 | 2.4.4 and 2.4.5 | not available | 8.1 |
+
+Releases up to 1.0.5 are not covered by this table: they declared `php ^8.0` and any `magento/framework` version, and their method signatures use native `mixed` or union types, which the code generator of Magento 2.4.4 and 2.4.5 rejects (`setup:di:compile` fails).
+
+This module depends on the private Akeneo connector, so it is not part of the automated compile check.
+
 ## Who is developing this module ?
 
 ![Smile](doc/static/smile.png)
