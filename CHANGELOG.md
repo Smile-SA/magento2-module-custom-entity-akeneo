@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.1.0 - Unreleased
+
+- Supported platforms: Magento 2.4.6 and later, Mage-OS 1.0.0 and later (tested up to Magento 2.4.9 and Mage-OS 4.0), PHP 8.1 to 8.5
+- `composer.json` now states it: `php ^8.1` and `magento/framework >=103.0.6` (previously `php ^8.0` and any `magento/framework` version)
+- Magento 2.4.4 and 2.4.5 are supported by the 1.0.x line, from 1.0.6
+
 ## 1.0.5 - 2025-07-30
 
 - Fix import of smile_custom_entity type attributes when frontend input type does not match between akeneo and magento [#25](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/25)
