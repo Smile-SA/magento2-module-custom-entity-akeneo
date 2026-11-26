@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.6 - Unreleased
+
+- Supported platforms: Magento 2.4.4 and 2.4.5 only, PHP 8.1
+- `composer.json` now states it: `php ^8.1` and `magento/framework >=103.0.4 <103.0.6` (previously `php ^8.0` and any `magento/framework` version)
+- Magento 2.4.6 and later and Mage-OS are supported by the 1.1.x line
+- Fix `setup:di:compile` on Magento 2.4.4 and 2.4.5: native `mixed` and union types are removed from method signatures and kept in docblocks
+- Require the Smile modules of the same line: `smile/module-custom-entity ~1.3.17`, `smile/module-custom-entity-product-link ~1.4.5`
+
 ## 1.0.5 - 2025-07-30
 
 - Fix import of smile_custom_entity type attributes when frontend input type does not match between akeneo and magento [#25](https://github.com/Smile-SA/magento2-module-custom-entity-akeneo/pull/25)
